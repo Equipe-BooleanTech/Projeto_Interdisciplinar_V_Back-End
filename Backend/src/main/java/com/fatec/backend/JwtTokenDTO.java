@@ -1,4 +1,4 @@
 package com.fatec.backend;
 
-public class JwtTokenDTO {
+public record JwtTokenDTO(String token) {
 }

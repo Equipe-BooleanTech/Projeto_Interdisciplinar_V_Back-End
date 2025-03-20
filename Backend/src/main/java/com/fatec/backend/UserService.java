@@ -65,8 +65,8 @@ public class UserService {
 
         public void atualizarUsuario(UUID id, UpdateUserDTO updateUserDTO) {
             User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
-            user.setEmail(updateUserDTO.getEmail());
-            user.setUsername(updateUserDTO.getUsername());
+            user.setEmail(updateUserDTO.email);
+            user.setUsername(updateUserDTO.username);
             userRepository.save(user);
         }
 

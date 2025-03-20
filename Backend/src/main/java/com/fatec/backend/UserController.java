@@ -26,8 +26,8 @@ public class UserController {
         try {
             JwtTokenDTO tokenDTO = userService.authenticarUsuario(loginUserDTO);
             UUID userId = userService.buscarIdPorEmail(loginUserDTO.getEmail());
-            String fullName = userService.buscarNomePorEmail(loginUserDTO.getUsername());
-            LoginResponseDTO response = new LoginResponseDTO(userId, tokenDTO.token());
+            String username = userService.buscarNomePorEmail(loginUserDTO.getUsername());
+            LoginResponseDTO response = new LoginResponseDTO(userId,username, tokenDTO.token());
             return ResponseEntity.ok().body(response);
 
         } catch (UserNotFoundException e) {
@@ -42,7 +42,7 @@ public class UserController {
             UUID id = userService.salvarUsuario(createUserDTO);
             SuccessResponse response = new SuccessResponse("USUÁRIO CRIADO COM SUCESSO!", id);
             return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (UserCreationFailedException e) {
+        } catch (UserNotFoundException e) {
             throw e;
         }
 
@@ -56,8 +56,8 @@ public class UserController {
             userService.atualizarUsuario(id, updateUserDTO);
             UpdateResponse response = new UpdateResponse("USUÁRIO ATUALIZADO COM SUCESSO!");
             return new ResponseEntity<>(response, HttpStatus.OK);
-        }catch (UserUpdateFailedException e){
-            throw  e;
+        } catch (UserNotFoundException e) {
+            throw e;
         }
     }
 
@@ -68,53 +68,12 @@ public class UserController {
             userService.deletarUsuario(id);
             SuccessResponse response = new SuccessResponse("USUÁRIO DELETADO COM SUCESSO!", id);
             return ResponseEntity.noContent().build();
-        }catch (UserDeletionFailedException e){
-            throw e;
-        }
-    }
-
-
-    @PutMapping("/update-password")
-    public ResponseEntity<String> mudarSenha(@RequestBody @Valid UpdatePasswordDTO updatePasswordDTO) {
-        userService.mudarSenha(updatePasswordDTO);
-        return ResponseEntity.ok("Senha atualizada com sucesso!");
-    }
-
-
-    @GetMapping("/get-users")
-    public ResponseEntity<Page<UserDTO>> listarTodosUsuarios(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<UserDTO> users = (Page<UserDTO>) userService.listarTodosUsuarios(PageRequest.of(page, size));
-        return ResponseEntity.ok(users);
-    }
-    @GetMapping("/get-users-by-id/{id}")
-    public ResponseEntity<?> buscarPorId(@PathVariable UUID id) {
-        try{
-            Optional<User> user = userService.listarPeloId(id);
-
-            if (user.isPresent()) {
-                return ResponseEntity.ok(user);
-            } else {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("USUÁRIO NÃO ENCONTRADO");
-            }}catch (UserNotFoundException e){
+        } catch (UserNotFoundException e) {
             throw e;
         }
     }
 
 
 
-
-    @PostMapping("/list-users-by-period")
-    public ResponseEntity<?> listarUsuariosPorPeriodo(
-            @RequestBody DateRangeDTO dateRangeDTO,
-            @RequestParam(defaultValue = "monthly") String groupingType) {
-        TimeSummaryDTO usuariosPorPeriodo = userService.listarUsuariosPorPeriodo(dateRangeDTO);
-        if (usuariosPorPeriodo.data().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("NENHUM USUARIO ENCONTRADO NO PERÍODO ESPECIFICADO");
-        } else {
-            return ResponseEntity.ok(usuariosPorPeriodo);
-        }
-    }
 
 }

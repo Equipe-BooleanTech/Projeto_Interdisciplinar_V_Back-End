@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.response;
+package com.fatec.backend;
 
 import java.util.UUID;
 
