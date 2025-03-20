@@ -76,4 +76,9 @@ public class UserService {
             }
             userRepository.deleteById(id);
         }
+
+    public JwtTokenDTO authenticarUsuario(LoginUserDTO loginUserDTO){
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                loginUserDTO.getEmail(),
+                loginUserDTO.getPassword());}
     }
