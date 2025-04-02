@@ -1,6 +1,7 @@
 package com.fatec.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.UUID;
@@ -17,7 +18,7 @@ public class Vehicle {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
 
-    @Column(unique = true, nullable = false)
+    @NotBlank(message = "A placa é obrigatória")
     private String plate;
     private String model;
     private String color;

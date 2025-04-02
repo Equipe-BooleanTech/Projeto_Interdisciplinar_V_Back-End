@@ -1,8 +1,11 @@
 package com.fatec.backend.DTO.vehicle;
 
+import com.fatec.backend.model.User;
+
 import java.util.UUID;
 
 public record VehicleDTO(
+        UUID id,
         String plate,
         String model,
         String color,
@@ -14,6 +17,6 @@ public record VehicleDTO(
         String fuelType,
         Double fuelCapacity,
         Double fuelConsumption,
-        UUID userId
+        User userId
 ) {
 }

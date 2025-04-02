@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 "/api/vehicle/findbyid-vehicle/{id}",
                                 "/api/users/create-user",
                                 "/api/users/delete/{id}",
-                                "/api/users/update/{id}"
+                                "/api/users/update/{id}",
+                                "/api/users/listall-users"
                         ).permitAll()
                 ).cors(c -> c.configurationSource(corsConfig))
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -20,8 +20,14 @@ public class VehicleService {
     private final UserRepository userRepository;
 
     public UUID createVehicle(VehicleDTO vehicleDTO, UUID userId) {
+        System.out.println("Recebido: " + vehicleDTO);
+
         if (vehicleRespository.findByPlate(vehicleDTO.plate()).isPresent()) {
             throw new IllegalArgumentException("Placa já cadastrada!");
+        }
+
+        if (vehicleDTO.plate() == null || vehicleDTO.plate().isBlank()) {
+            throw new IllegalArgumentException("A placa não pode ser nula ou vazia!");
         }
 
         User user = userRepository.findById(userId)

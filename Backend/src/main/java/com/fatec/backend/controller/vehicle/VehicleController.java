@@ -4,7 +4,6 @@ import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.model.Vehicle;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.service.vehicle.VehicleService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,6 +23,7 @@ public class VehicleController {
 
     @PostMapping("/create-vehicle/{userId}")
     public ResponseEntity<UUID> createVehicle(@PathVariable UUID userId, @RequestBody VehicleDTO vehicleDTO) {
+        System.out.println("Recebido JSON: " + vehicleDTO);
         UUID vehicleId = vehicleService.createVehicle(vehicleDTO, userId);
         return ResponseEntity.ok(vehicleId);
     }

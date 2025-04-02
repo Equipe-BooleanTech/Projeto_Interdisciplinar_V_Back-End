@@ -25,6 +25,7 @@ public class User {
     private String name;
     private String lastname;
     private String Phone;
+    private String birthdate;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Vehicle> vehicles;
 }

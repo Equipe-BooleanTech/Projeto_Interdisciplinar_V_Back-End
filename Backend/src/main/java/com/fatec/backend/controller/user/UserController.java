@@ -5,6 +5,8 @@ import com.fatec.backend.DTO.auth.LoginUserDTO;
 import com.fatec.backend.DTO.user.CreateUserDTO;
 import com.fatec.backend.DTO.auth.JwtTokenDTO;
 import com.fatec.backend.DTO.user.UpdateUserDTO;
+import com.fatec.backend.DTO.user.UserDTO;
+import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.exception.UserNotFoundException;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.response.UpdateResponse;
@@ -12,6 +14,8 @@ import com.fatec.backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -66,7 +70,13 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/listall-users")
+    public ResponseEntity<Page<UserDTO>> listAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Page<UserDTO> vehicles = userService.listUsers(PageRequest.of(page, size));
+        return new ResponseEntity<>(vehicles,HttpStatus.FOUND);
+    }
 
 
 }

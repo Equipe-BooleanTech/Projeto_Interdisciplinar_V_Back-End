@@ -5,14 +5,21 @@ import com.fatec.backend.DTO.user.CreateUserDTO;
 import com.fatec.backend.DTO.auth.JwtTokenDTO;
 import com.fatec.backend.DTO.auth.LoginUserDTO;
 import com.fatec.backend.DTO.user.UpdateUserDTO;
+import com.fatec.backend.DTO.user.UserDTO;
+import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.exception.InvalidCredentialsException;
 import com.fatec.backend.exception.UserNotFoundException;
+import com.fatec.backend.mapper.user.UserMapper;
+import com.fatec.backend.mapper.vehicle.VehicleMapper;
 import com.fatec.backend.model.UserDetailsImpl;
+import com.fatec.backend.model.Vehicle;
 import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.configuration.SecurityConfig;
 import com.fatec.backend.model.User;
 import com.fatec.backend.service.auth.JwtTokenService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,6 +65,7 @@ public class UserService {
                     .name(createUserDTO.name())
                     .lastname(createUserDTO.lastname())
                     .Phone(createUserDTO.phone())
+                    .birthdate(createUserDTO.birthdate())
                     .build();
 
             return userRepository.save(user).getId();
@@ -92,5 +100,14 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("ERRO INESPERADO NA AUTENTICAÇÃO: " + e.getMessage());
         }
+    }
+
+    public Page<UserDTO> listUsers(PageRequest pageRequest) {
+        return userRepository.findAll(pageRequest)
+                .map(UserMapper.INSTANCE::ToUserDTO);
+    }
+
+    public User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
     }
     }

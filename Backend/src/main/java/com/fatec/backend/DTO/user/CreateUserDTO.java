@@ -13,6 +13,7 @@ public record CreateUserDTO (
         String name,
         String lastname,
         String phone,
+        String birthdate,
         List<VehicleDTO> vehicles
 ) {
 }
