@@ -57,7 +57,7 @@ public class UserService {
                     .password(passwordEncoder.encode(createUserDTO.password()))
                     .name(createUserDTO.name())
                     .lastname(createUserDTO.lastname())
-                    .Phone(createUserDTO.Phone())
+                    .Phone(createUserDTO.phone())
                     .build();
 
             return userRepository.save(user).getId();

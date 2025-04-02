@@ -22,11 +22,10 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    @PostMapping("/create-vehicle")
-    public ResponseEntity<SuccessResponse> createVehicle(@RequestBody VehicleDTO  vehicleDTO) {
-        UUID id = vehicleService.createVehicle(vehicleDTO);
-        SuccessResponse response = new SuccessResponse("Veículo criado com sucesso",id);
-        return new ResponseEntity<>(response,HttpStatus.CREATED);
+    @PostMapping("/create-vehicle/{userId}")
+    public ResponseEntity<UUID> createVehicle(@PathVariable UUID userId, @RequestBody VehicleDTO vehicleDTO) {
+        UUID vehicleId = vehicleService.createVehicle(vehicleDTO, userId);
+        return ResponseEntity.ok(vehicleId);
     }
 
     @PutMapping("/update-vehicle/{id}")

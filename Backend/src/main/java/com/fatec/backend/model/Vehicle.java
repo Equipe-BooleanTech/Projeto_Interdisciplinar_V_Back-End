@@ -4,19 +4,20 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.UUID;
-@Table(name="veiculos")
+
+@Table(name = "veiculos")
 @Entity
 @Getter
 @Setter
 @AllArgsConstructor
-@Builder
-@Data
 @NoArgsConstructor
+@Builder
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID uuid;
-    @Column(unique = true)
+
+    @Column(unique = true, nullable = false)
     private String plate;
     private String model;
     private String color;
@@ -24,8 +25,14 @@ public class Vehicle {
     private String type;
     private String description;
     private String year;
-    private String Km;
+
+    @Column(name = "km")
+    private String km;
     private String fuelType;
     private Double fuelCapacity;
     private Double fuelConsumption;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 }

@@ -3,6 +3,7 @@ package com.fatec.backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Table(name="usuarios")
@@ -24,5 +25,6 @@ public class User {
     private String name;
     private String lastname;
     private String Phone;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Vehicle> vehicles;
 }

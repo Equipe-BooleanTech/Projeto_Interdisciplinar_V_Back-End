@@ -2,8 +2,11 @@ package com.fatec.backend.service.vehicle;
 
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.mapper.vehicle.VehicleMapper;
+import com.fatec.backend.model.User;
 import com.fatec.backend.model.Vehicle;
+import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.repository.VehicleRespository;
+import com.fatec.backend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,11 +17,16 @@ import java.util.UUID;
 @AllArgsConstructor
 public class VehicleService {
     private final VehicleRespository vehicleRespository;
+    private final UserRepository userRepository;
 
-    public UUID createVehicle(VehicleDTO vehicleDTO) {
-        if(vehicleRespository.findByPlate(vehicleDTO.plate()).isPresent()) {
-            throw new IllegalArgumentException("Plate already exists");
+    public UUID createVehicle(VehicleDTO vehicleDTO, UUID userId) {
+        if (vehicleRespository.findByPlate(vehicleDTO.plate()).isPresent()) {
+            throw new IllegalArgumentException("Placa já cadastrada!");
         }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado!"));
+
         Vehicle vehicle = Vehicle.builder()
                 .plate(vehicleDTO.plate())
                 .model(vehicleDTO.model())
@@ -27,15 +35,14 @@ public class VehicleService {
                 .type(vehicleDTO.type())
                 .description(vehicleDTO.description())
                 .year(vehicleDTO.year())
-                .Km(vehicleDTO.Km())
+                .km(vehicleDTO.km())
                 .fuelType(vehicleDTO.fuelType())
                 .fuelCapacity(vehicleDTO.fuelCapacity())
                 .fuelConsumption(vehicleDTO.fuelConsumption())
+                .user(user)
                 .build();
 
-        vehicleRespository.save(vehicle);
-
-        return vehicle.getUuid();
+        return vehicleRespository.save(vehicle).getUuid();
     }
 
     public void updateVehicle(UUID id,VehicleDTO vehicleDTO) {
@@ -47,7 +54,7 @@ public class VehicleService {
         vehicle.setType(vehicleDTO.type());
         vehicle.setDescription(vehicleDTO.description());
         vehicle.setYear(vehicleDTO.year());
-        vehicle.setKm(vehicleDTO.Km());
+        vehicle.setKm(vehicleDTO.km());
         vehicle.setFuelType(vehicleDTO.fuelType());
         vehicle.setFuelCapacity(vehicleDTO.fuelCapacity());
         vehicle.setFuelConsumption(vehicleDTO.fuelConsumption());

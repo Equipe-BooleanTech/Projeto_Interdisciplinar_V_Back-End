@@ -1,11 +1,9 @@
 package com.fatec.backend.DTO.user;
 
+import com.fatec.backend.DTO.vehicle.VehicleDTO;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-
+import java.util.List;
 import java.util.UUID;
-
 
 public record CreateUserDTO (
         UUID id,
@@ -14,5 +12,7 @@ public record CreateUserDTO (
         String password,
         String name,
         String lastname,
-        String Phone){
+        String phone,
+        List<VehicleDTO> vehicles
+) {
 }

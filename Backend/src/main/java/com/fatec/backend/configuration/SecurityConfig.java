@@ -1,6 +1,7 @@
 package com.fatec.backend.configuration;
 
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,14 +14,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
+@AllArgsConstructor
 @Configuration
 public class SecurityConfig {
-    @Autowired
-    private UserAuthenticationFilter userAuthenticationFilter;
 
-    @Autowired
-    private CorsConfig corsConfig;
+    private final UserAuthenticationFilter userAuthenticationFilter;
+
+    private final CorsConfig corsConfig;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 "/swagger-ui",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api/vehicle/create-vehicle",
+                                "/api/vehicle/create-vehicle/{userId}",
                                 "/api/vehicle/update-vehicle/{id}",
                                 "/api/vehicle/delete-vehicle/{id}",
                                 "/api/vehicle/listall-vehicle",
