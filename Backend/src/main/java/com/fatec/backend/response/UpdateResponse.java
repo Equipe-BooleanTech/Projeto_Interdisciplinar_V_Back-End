@@ -1,6 +1,4 @@
-package com.fatec.backend;
-
-import java.util.UUID;
+package com.fatec.backend.response;
 
 public class UpdateResponse {
     private String message;

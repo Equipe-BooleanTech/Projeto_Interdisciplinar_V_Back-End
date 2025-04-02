@@ -1,4 +1,4 @@
-package com.example.Restaurantto.PDV.exception.user;
+package com.fatec.backend.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
 

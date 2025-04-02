@@ -1,4 +1,4 @@
-package com.fatec.backend;
+package com.fatec.backend.response;
 
 import java.util.UUID;
 
