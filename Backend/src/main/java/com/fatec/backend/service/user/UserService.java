@@ -104,7 +104,7 @@ public class UserService {
 
     public Page<UserDTO> listUsers(PageRequest pageRequest) {
         return userRepository.findAll(pageRequest)
-                .map(UserMapper.INSTANCE::ToUserDTO);
+                .map(UserMapper.INSTANCE::toUserDTO);
     }
 
     public User findById(UUID id) {
