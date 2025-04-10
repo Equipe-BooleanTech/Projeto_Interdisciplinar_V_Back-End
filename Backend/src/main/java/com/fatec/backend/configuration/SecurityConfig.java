@@ -41,7 +41,11 @@ public class SecurityConfig {
                                 "/api/users/create-user",
                                 "/api/users/delete/{id}",
                                 "/api/users/update/{id}",
-                                "/api/users/listall-users"
+                                "/api/users/listall-users",
+                                "/api/fipe/marcas",
+                                "/api/fipe/marcas/{marcaId}/modelos",
+                                "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos",
+                                "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos/{anoId}"
                         ).permitAll()
                 ).cors(c -> c.configurationSource(corsConfig))
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
