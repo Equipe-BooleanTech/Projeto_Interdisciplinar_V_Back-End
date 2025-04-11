@@ -6,6 +6,6 @@ import lombok.Data;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record MarcaAnoDTO (
-    String id,
-    String name
+    String codigo,
+    String nome
 ){}
