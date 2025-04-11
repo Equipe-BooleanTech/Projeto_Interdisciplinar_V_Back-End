@@ -1,16 +1,18 @@
 package com.fatec.backend.DTO.FIPE;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record FipeDetailsDTO(
-        String modelo,
-        String marca,
-        Integer anoModelo,
-        String combustivel,
-        String codigoFipe,
-        Integer tipoVeiculo
+        Integer TipoVeiculo,
+        String Valor,
+        String Marca,
+        String Modelo,
+        Integer AnoModelo,
+        String Combustivel,
+        String CodigoFipe,
+        String MesReferencia,
+        String SiglaCombustivel
 ) {
 }
