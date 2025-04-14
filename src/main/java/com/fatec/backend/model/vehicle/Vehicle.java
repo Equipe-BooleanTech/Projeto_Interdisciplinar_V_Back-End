@@ -1,5 +1,6 @@
-package com.fatec.backend.model;
+package com.fatec.backend.model.vehicle;
 
+import com.fatec.backend.model.User.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -28,7 +29,7 @@ public class Vehicle {
     private String year;
 
     @Column(name = "km")
-    private String km;
+    private Double km;
     private String fuelType;
     private Double fuelCapacity;
     private Double fuelConsumption;

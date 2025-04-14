@@ -1,7 +1,7 @@
 package com.fatec.backend.repository;
 
 
-import com.fatec.backend.model.User;
+import com.fatec.backend.model.User.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

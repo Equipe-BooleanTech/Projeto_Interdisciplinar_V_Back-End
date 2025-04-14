@@ -1,4 +1,4 @@
-package com.fatec.backend.model;
+package com.fatec.backend.model.User;
 
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;

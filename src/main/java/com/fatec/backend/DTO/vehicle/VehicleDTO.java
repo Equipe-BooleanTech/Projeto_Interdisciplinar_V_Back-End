@@ -1,6 +1,6 @@
 package com.fatec.backend.DTO.vehicle;
 
-import com.fatec.backend.model.User;
+import com.fatec.backend.model.User.User;
 
 import java.util.UUID;
 
