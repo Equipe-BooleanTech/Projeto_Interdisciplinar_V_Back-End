@@ -2,7 +2,7 @@ package com.fatec.backend.service.vehicle;
 
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.mapper.vehicle.VehicleMapper;
-import com.fatec.backend.model.User.User;
+import com.fatec.backend.model.User;
 import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.repository.VehicleRespository;

@@ -1,4 +1,4 @@
-package com.fatec.backend.model.User;
+package com.fatec.backend.model;
 
 import com.fatec.backend.model.vehicle.Vehicle;
 import jakarta.persistence.*;

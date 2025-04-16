@@ -1,7 +1,7 @@
 package com.fatec.backend.mapper.user;
 
 import com.fatec.backend.DTO.user.UserDTO;
-import com.fatec.backend.model.User.User;
+import com.fatec.backend.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

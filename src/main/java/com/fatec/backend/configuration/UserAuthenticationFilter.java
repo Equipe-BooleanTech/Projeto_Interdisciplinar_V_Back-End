@@ -1,9 +1,6 @@
 package com.fatec.backend.configuration;
-
-
-
-import com.fatec.backend.model.User.User;
-import com.fatec.backend.model.User.UserDetailsImpl;
+import com.fatec.backend.model.User;
+import com.fatec.backend.model.UserDetailsImpl;
 import com.fatec.backend.repository.UserRepository;
 
 import com.fatec.backend.service.auth.JwtTokenService;

@@ -1,6 +1,6 @@
 package com.fatec.backend.model.vehicle;
 
-import com.fatec.backend.model.User.User;
+import com.fatec.backend.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
