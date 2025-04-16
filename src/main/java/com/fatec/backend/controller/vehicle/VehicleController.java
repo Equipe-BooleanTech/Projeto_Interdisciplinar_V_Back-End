@@ -1,7 +1,7 @@
 package com.fatec.backend.controller.vehicle;
 
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
-import com.fatec.backend.model.Vehicle;
+import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.service.vehicle.VehicleService;
 import lombok.AllArgsConstructor;

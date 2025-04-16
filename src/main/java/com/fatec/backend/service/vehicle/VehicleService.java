@@ -3,10 +3,9 @@ package com.fatec.backend.service.vehicle;
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.mapper.vehicle.VehicleMapper;
 import com.fatec.backend.model.User;
-import com.fatec.backend.model.Vehicle;
+import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.repository.VehicleRespository;
-import com.fatec.backend.service.user.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +40,7 @@ public class VehicleService {
                 .type(vehicleDTO.type())
                 .description(vehicleDTO.description())
                 .year(vehicleDTO.year())
-                .km(vehicleDTO.km())
+                .km(Double.valueOf(vehicleDTO.km()))
                 .fuelType(vehicleDTO.fuelType())
                 .fuelCapacity(vehicleDTO.fuelCapacity())
                 .fuelConsumption(vehicleDTO.fuelConsumption())
@@ -60,7 +59,7 @@ public class VehicleService {
         vehicle.setType(vehicleDTO.type());
         vehicle.setDescription(vehicleDTO.description());
         vehicle.setYear(vehicleDTO.year());
-        vehicle.setKm(vehicleDTO.km());
+        vehicle.setKm(Double.valueOf(vehicleDTO.km()));
         vehicle.setFuelType(vehicleDTO.fuelType());
         vehicle.setFuelCapacity(vehicleDTO.fuelCapacity());
         vehicle.setFuelConsumption(vehicleDTO.fuelConsumption());
