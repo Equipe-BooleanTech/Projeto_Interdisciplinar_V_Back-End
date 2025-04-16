@@ -1,5 +1,6 @@
 package com.fatec.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fatec.backend.model.vehicle.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,6 +28,7 @@ public class User {
     private String lastname;
     private String Phone;
     private String birthdate;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Vehicle> vehicles;
 }

@@ -48,7 +48,7 @@ public class GasStationController {
         return new ResponseEntity<>(gasStations, HttpStatus.FOUND);
     }
 
-    @GetMapping("findbyid-gas-station/{id}")
+    @GetMapping("/findbyid-gas-station/{id}")
     public ResponseEntity<?> findGasStationById(@PathVariable UUID id) {
         Optional<GasStation> gasStation = Optional.ofNullable(gasStationService.findById(id));
         if (gasStation.isPresent()) {

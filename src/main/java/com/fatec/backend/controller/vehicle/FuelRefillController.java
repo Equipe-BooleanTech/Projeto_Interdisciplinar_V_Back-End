@@ -5,6 +5,7 @@ package com.fatec.backend.controller.vehicle;
 import com.fatec.backend.DTO.vehicle.FuelRefillDTO;
 
 import com.fatec.backend.model.vehicle.FuelRefill;
+import com.fatec.backend.model.vehicle.GasStation;
 import com.fatec.backend.repository.FuelRefillRepository;
 
 import com.fatec.backend.service.vehicle.FuelRefillService;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 //TODO ajeitar o list all que nao esta retornando os ids do carro o usuario
 @RestController
@@ -49,5 +51,15 @@ public class FuelRefillController {
     public ResponseEntity<?> delete(@PathVariable UUID id) {
         fuelRefillService.deleteFuelRefill(id);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(id+"\nDeletado com sucesso!");
+    }
+
+    @GetMapping("/find-by-id-fuel-refill/{id}")
+    public ResponseEntity<?> findFuelRefillById(@PathVariable UUID id) {
+        Optional<FuelRefill> fuelRefill = Optional.ofNullable(fuelRefillService.getFuelRefill(id));
+        if (fuelRefill.isPresent()) {
+            return ResponseEntity.status(HttpStatus.FOUND).body(fuelRefill);
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Abastecimento não encontrado");
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.fatec.backend.DTO.vehicle;
 
+import com.fatec.backend.enums.FuelType;
 import com.fatec.backend.model.User;
 
 import java.util.UUID;
@@ -14,7 +15,7 @@ public record VehicleDTO(
         String description,
         String year,
         String km,
-        String fuelType,
+        FuelType fuelType,
         Double fuelCapacity,
         Double fuelConsumption,
         User userId

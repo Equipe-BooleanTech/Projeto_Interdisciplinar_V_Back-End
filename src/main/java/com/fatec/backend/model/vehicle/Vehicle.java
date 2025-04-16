@@ -1,5 +1,7 @@
 package com.fatec.backend.model.vehicle;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fatec.backend.enums.FuelType;
 import com.fatec.backend.model.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -30,11 +32,13 @@ public class Vehicle {
 
     @Column(name = "km")
     private Double km;
-    private String fuelType;
+    @Enumerated(EnumType.STRING)
+    private FuelType fuelType;
     private Double fuelCapacity;
     private Double fuelConsumption;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonBackReference
     private User user;
 }

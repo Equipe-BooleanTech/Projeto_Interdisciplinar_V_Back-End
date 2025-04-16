@@ -83,4 +83,9 @@ public class FuelRefillService {
         return fuelRefillRepository.findAll(pageRequest)
                 .map(FuelRefillMapper.INSTANCE::toFuelRefillDTO);
     }
+
+    public FuelRefill getFuelRefill(UUID id) {
+        return fuelRefillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Fuel refill not found"));
+
+    }
 }

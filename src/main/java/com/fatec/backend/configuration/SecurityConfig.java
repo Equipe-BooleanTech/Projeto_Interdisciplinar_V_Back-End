@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 "/api/vehicle/fuel-refill/update-fuel-refill/{id}",
                                 "/api/vehicle/fuel-refill/delete-refill/{id}",
                                 "/api/vehicle/fuel-refill/list-all-fuel-refill",
+                                "/api/vehicle/fuel-refill/find-by-id-fuel-refill/{id}",
                                 "/api/gasstation/create-gas-station",
                                 "/api/gasstation/update-gas-station/{id}",
                                 "/api/gasstation/delete-gas-station/{id}",
