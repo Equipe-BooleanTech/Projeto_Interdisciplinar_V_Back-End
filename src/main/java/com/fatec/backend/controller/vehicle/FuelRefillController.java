@@ -37,20 +37,6 @@ public class FuelRefillController {
         return ResponseEntity.ok(fuelRefillRepository.findAll());
     }
 
-    @GetMapping("/vehicle/{vehicleId}")
-    public ResponseEntity<FuelRefillSummaryDTO> getByVehicle(@PathVariable UUID vehicleId, Pageable pageable) {
-        return ResponseEntity.ok(fuelRefillService.getRefillsByVehicle(vehicleId, pageable));
-    }
-
-    @GetMapping("/vehicle/{vehicleId}/period")
-    public ResponseEntity<FuelRefillSummaryDTO> getByVehicleAndPeriod(
-            @PathVariable UUID vehicleId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-            Pageable pageable
-    ) {
-        return ResponseEntity.ok(fuelRefillService.getRefillsByVehicleAndPeriod(vehicleId, start, end, pageable));
-    }
 
     @DeleteMapping("/delete-refill/{refillId}")
     public ResponseEntity<UUID> delete(@PathVariable UUID refillId) {

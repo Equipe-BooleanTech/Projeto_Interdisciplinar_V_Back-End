@@ -1,7 +1,6 @@
 package com.fatec.backend.model.vehicle;
 
 import com.fatec.backend.enums.FuelType;
-import com.fatec.backend.model.User.User;
 import jakarta.persistence.*;
 import lombok.*;
 

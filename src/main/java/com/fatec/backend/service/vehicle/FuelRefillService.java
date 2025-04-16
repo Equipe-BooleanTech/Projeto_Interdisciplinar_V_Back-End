@@ -53,16 +53,6 @@ public class FuelRefillService {
         return fuelRefillRepository.save(refill).getId();
     }
 
-    public FuelRefillSummaryDTO getRefillsByVehicle(UUID vehicleId, Pageable pageable) {
-        Page<FuelRefill> page = (Page<FuelRefill>) fuelRefillRepository.findByVehicleId(vehicleId, pageable);
-        return summarize(page);
-    }
-
-    public FuelRefillSummaryDTO getRefillsByVehicleAndPeriod(UUID vehicleId, LocalDateTime start, LocalDateTime end, Pageable pageable) {
-        Page<FuelRefill> page = (Page<FuelRefill>) fuelRefillRepository.findByVehicleIdAndDateBetween(vehicleId, start, end, pageable);
-        return summarize(page);
-    }
-
     private FuelRefillSummaryDTO summarize(Page<FuelRefill> page) {
         double totalLiters = page.stream().mapToDouble(FuelRefill::getLiters).sum();
         double totalCost = page.stream().mapToDouble(FuelRefill::getTotalCost).sum();
