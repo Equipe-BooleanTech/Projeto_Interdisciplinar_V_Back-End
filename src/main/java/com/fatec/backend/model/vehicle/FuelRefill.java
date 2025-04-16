@@ -33,6 +33,6 @@ public class FuelRefill {
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
 
-    private LocalDateTime date;
+    private LocalDateTime refillDate;
 
 }

@@ -45,7 +45,16 @@ public class SecurityConfig {
                                 "/api/fipe/marcas",
                                 "/api/fipe/marcas/{marcaId}/modelos",
                                 "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos",
-                                "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos/{anoId}"
+                                "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos/{anoId}",
+                                "/api/vehicle/fuel-refill/new-fuel-refill/{vehicleId}/{gasStationId}",
+                                "/api/vehicle/fuel-refill/update-fuel-refill/{id}",
+                                "/api/vehicle/fuel-refill/delete-refill/{id}",
+                                "/api/vehicle/fuel-refill/list-all-fuel-refill",
+                                "/api/gasstation/create-gas-station",
+                                "/api/gasstation/update-gas-station/{id}",
+                                "/api/gasstation/delete-gas-station/{id}",
+                                "/api/gasstation/findbyid-gas-station/{id}",
+                                "/api/gasstation/listall-gas-station"
                         ).permitAll()
                 ).cors(c -> c.configurationSource(corsConfig))
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

@@ -19,8 +19,9 @@ public class GasStationService {
     public UUID createGasStation(GasStationDTO dto) {
         GasStation gasStation = GasStation.builder()
                 .name(dto.name())
-                .state(dto.state())
+                .address(dto.address())
                 .city(dto.city())
+                .state(dto.state())
                 .description(dto.description())
                 .rating(dto.rating())
                 .build();
@@ -30,8 +31,9 @@ public class GasStationService {
     public void updateGasStation(UUID id, GasStationDTO dto) {
         GasStation gasStation = gasStationRepository.findById(id).orElseThrow(() -> new RuntimeException("GasStation not found"));
         gasStation.setName(dto.name());
-        gasStation.setState(dto.state());
+        gasStation.setAddress(dto.address());
         gasStation.setCity(dto.city());
+        gasStation.setState(dto.state());
         gasStation.setDescription(dto.description());
         gasStation.setRating(dto.rating());
         gasStationRepository.save(gasStation);
