@@ -1,5 +1,6 @@
 package com.fatec.backend.model;
 
+import com.fatec.backend.model.vehicle.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
 
