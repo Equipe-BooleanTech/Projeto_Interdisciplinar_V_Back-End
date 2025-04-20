@@ -2,7 +2,6 @@ package com.fatec.backend.configuration;
 
 
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -56,8 +55,7 @@ public class SecurityConfig {
                                 "/api/gasstation/delete-gas-station/{id}",
                                 "/api/gasstation/findbyid-gas-station/{id}",
                                 "/api/gasstation/listall-gas-station"
-                        ).permitAll()
-                ).cors(c -> c.configurationSource(corsConfig))
+                        ).permitAll())
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
