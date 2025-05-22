@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 @AllArgsConstructor
 @Configuration
 public class SecurityConfig {
@@ -25,6 +26,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfig))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(
@@ -32,7 +34,7 @@ public class SecurityConfig {
                                 "/swagger-ui",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/api/vehicle/create-vehicle/{userId}",
+                                "/api/vehicle/create-vehicle/{id}",
                                 "/api/vehicle/update-vehicle/{id}",
                                 "/api/vehicle/delete-vehicle/{id}",
                                 "/api/vehicle/listall-vehicle",

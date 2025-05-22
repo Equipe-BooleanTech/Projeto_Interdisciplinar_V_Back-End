@@ -21,10 +21,10 @@ public class VehicleController {
 
     private final VehicleService vehicleService;
 
-    @PostMapping("/create-vehicle/{userId}")
-    public ResponseEntity<UUID> createVehicle(@PathVariable UUID userId, @RequestBody VehicleDTO vehicleDTO) {
+    @PostMapping("/create-vehicle/{id}")
+    public ResponseEntity<UUID> createVehicle(@PathVariable UUID id, @RequestBody VehicleDTO vehicleDTO) {
         System.out.println("Recebido JSON: " + vehicleDTO);
-        UUID vehicleId = vehicleService.createVehicle(vehicleDTO, userId);
+        UUID vehicleId = vehicleService.createVehicle(vehicleDTO, id);
         return ResponseEntity.ok(vehicleId);
     }
 
