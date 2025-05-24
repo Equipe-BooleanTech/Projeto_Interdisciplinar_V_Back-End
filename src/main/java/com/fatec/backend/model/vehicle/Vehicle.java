@@ -37,6 +37,12 @@ public class Vehicle {
     private Double fuelCapacity;
     private Double fuelConsumption;
 
+    // Novos campos para controle de consumo
+    private Double lastKmPerLiter;
+    private Double averageKmPerLiter;
+    private Double totalLitersConsumed;
+    private Double totalKmDriven;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
