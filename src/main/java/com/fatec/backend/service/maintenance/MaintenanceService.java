@@ -47,7 +47,7 @@ public class MaintenanceService {
         }
 
         Maintenance savedMaintenance = maintenanceRepository.save(maintenance);
-        return maintenanceMapper.toDTO(savedMaintenance);
+        return maintenanceMapper.ToMaintenanceDTO(savedMaintenance);
     }
 
     @Transactional(readOnly = true)
@@ -57,8 +57,8 @@ public class MaintenanceService {
             throw new IllegalArgumentException("Veículo não encontrado com ID: " + vehicleId);
         }
         // A query findByVehicleId garante que só retornará manutenções do veículo correto.
-        return maintenanceRepository.findByVehicleUuid(vehicleId, pageable).map(maintenanceMapper::toDTO);
-    }
+        return maintenanceRepository.findByVehicleUuid(vehicleId, pageable).map(MaintenanceMapper.INSTANCE::ToMaintenanceDTO);
+
 
     @Transactional(readOnly = true)
     public MaintenanceDTO getMaintenanceById(UUID maintenanceId, UUID vehicleId) {
@@ -68,7 +68,7 @@ public class MaintenanceService {
         if (!maintenance.getVehicle().getUuid().equals(vehicleId)) {
             throw new SecurityException("Registro de manutenção não pertence ao veículo especificado.");
         }
-        return maintenanceMapper.toDTO(maintenance);
+        return maintenanceMapper.ToMaintenanceDTO(maintenance);
     }
 
     @Transactional
@@ -104,7 +104,7 @@ public class MaintenanceService {
 
         // A entidade Maintenance deve ter @PreUpdate para atualizar updatedAt automaticamente
         Maintenance updatedMaintenance = maintenanceRepository.save(existingMaintenance);
-        return maintenanceMapper.toDTO(updatedMaintenance);
+        return maintenanceMapper.ToMaintenanceDTO(updatedMaintenance);
     }
 
     @Transactional

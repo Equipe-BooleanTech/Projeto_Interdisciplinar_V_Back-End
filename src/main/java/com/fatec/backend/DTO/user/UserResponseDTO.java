@@ -2,6 +2,8 @@ package com.fatec.backend.DTO;
 
 import com.fatec.backend.model.User;
 
+import java.util.UUID;
+
 // DTO para resposta ao buscar detalhes do usuário
 record UserResponseDTO(UUID id, String fullName, String username, String email, String phone) {
     public static UserResponseDTO fromUser(User user) {
