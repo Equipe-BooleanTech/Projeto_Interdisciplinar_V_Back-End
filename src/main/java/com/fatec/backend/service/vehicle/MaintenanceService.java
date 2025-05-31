@@ -103,7 +103,7 @@ public class MaintenanceService {
             throw new IllegalArgumentException("Data inicial deve ser anterior à data final.");
         }
         return maintenanceRepository
-                .findByVehicleUuidAndMaintenanceDateBetween(vehicleId, startDate, endDate, pageRequest)
+                .findByVehicleUuidAndDateBetween(vehicleId, startDate, endDate, pageRequest)
                 .map(MaintenanceMapper.INSTANCE::ToMaintenanceDTO);
     }
     }

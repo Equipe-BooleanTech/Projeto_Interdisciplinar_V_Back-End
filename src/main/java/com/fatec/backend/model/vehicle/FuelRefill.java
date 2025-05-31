@@ -17,7 +17,7 @@ import java.util.UUID;
 public class FuelRefill {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID uuid;
 
     @ManyToOne
     private Vehicle vehicle;

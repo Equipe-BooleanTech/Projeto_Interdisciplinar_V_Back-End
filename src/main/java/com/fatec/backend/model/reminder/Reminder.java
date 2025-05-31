@@ -17,18 +17,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "reminders")
+@Table(name = "lembretes")
 public class Reminder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID uuid;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
-
     @ManyToOne
-    @JoinColumn(name = "vehicle_id") // Nullable, as a reminder can be general
+    @JoinColumn(name = "vehicle_id")
     private Vehicle vehicle;
 
     @Column(nullable = false)
@@ -53,14 +52,8 @@ public class Reminder {
     private ReminderStatus status = ReminderStatus.PENDING;
 
     private boolean isRecurring = false;
-
-    // Para recorrência, podemos adicionar campos como recurrenceInterval (ex: MONTHLY, YEARLY) e customRecurrenceDays
-    // String recurrenceInterval;
-    // Integer customRecurrenceDays;
-
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
 
     @PrePersist

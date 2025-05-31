@@ -1,22 +1,33 @@
 package com.fatec.backend.service.reminder;
 
 import com.fatec.backend.DTO.reminder.ReminderDTO;
-import com.fatec.backend.enums.ReminderStatus; // Importar ReminderStatus
+import com.fatec.backend.DTO.vehicle.FuelRefillDTO;
+import com.fatec.backend.enums.ReminderStatus;
 import com.fatec.backend.mapper.reminder.ReminderMapper;
-import com.fatec.backend.model.reminder.Reminder;
+import com.fatec.backend.mapper.vehicle.FuelRefillMapper;
 import com.fatec.backend.model.User;
+import com.fatec.backend.model.reminder.Reminder;
+import com.fatec.backend.model.vehicle.FuelRefill;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.repository.ReminderRepository;
 import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.repository.VehicleRespository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.thymeleaf.TemplateEngine;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate; // Importar LocalDate
-import java.util.List; // Importar List
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -26,24 +37,17 @@ public class ReminderService {
     private final ReminderRepository reminderRepository;
     private final UserRepository userRepository;
     private final VehicleRespository vehicleRepository;
-    private final ReminderMapper reminderMapper;
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     @Transactional
-    public ReminderDTO createReminder(ReminderDTO reminderDTO, UUID userId) {
+    public UUID createReminder(ReminderDTO reminderDTO, UUID vehicleId, UUID userId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new IllegalArgumentException("Veículo não encontrado com ID: " + vehicleId));
 
-        Vehicle vehicle = null;
-        if (reminderDTO.vehicleId() != null) {
-            vehicle = vehicleRepository.findById(reminderDTO.vehicleId())
-                    .orElseThrow(() -> new IllegalArgumentException("Vehicle not found with ID: " + reminderDTO.vehicleId()));
-            // Validação adicional: garantir que o veículo pertence ao usuário
-            if (!vehicle.getUser().getId().equals(userId)) {
-                throw new SecurityException("Vehicle does not belong to the user");
-            }
-        }
-
-        // Usando o padrão Builder para consistência
         Reminder reminder = Reminder.builder()
                 .title(reminderDTO.title())
                 .description(reminderDTO.description())
@@ -52,48 +56,23 @@ public class ReminderService {
                 .antecedenceDays(reminderDTO.antecedenceDays() != null ? reminderDTO.antecedenceDays() : 0) // Default 0 if null
                 .status(ReminderStatus.PENDING) // Default status PENDING
                 .isRecurring(reminderDTO.isRecurring())
-                .user(user)
                 .vehicle(vehicle)
+                .user(user)
                 .build();
-        // A lógica @PrePersist na entidade Reminder deve calcular reminderDate e createdAt
 
-        Reminder savedReminder = reminderRepository.save(reminder);
-        return reminderMapper.toDTO(savedReminder);
+        return reminderRepository.save(reminder).getUuid();
     }
 
-    @Transactional(readOnly = true)
-    public Page<ReminderDTO> getUserReminders(UUID userId, Pageable pageable) {
-        // A busca já filtra por usuário, não precisa buscar o User antes se a query for direta
-        // No entanto, manter a busca do User pode ser útil para validação inicial
-        if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("User not found with ID: " + userId);
-        }
-        // A query findByUser garante que só retornará lembretes do usuário correto.
-        return reminderRepository.findByUserId(userId, pageable).map(reminderMapper::toDTO);
-    }
-
-    @Transactional(readOnly = true)
-    public ReminderDTO getReminderById(UUID reminderId, UUID userId) {
-        Reminder reminder = reminderRepository.findById(reminderId)
-                .orElseThrow(() -> new IllegalArgumentException("Reminder not found with ID: " + reminderId));
-        // Validação para garantir que o lembrete pertence ao usuário
-        if (!reminder.getUser().getId().equals(userId)) {
-            throw new SecurityException("User not authorized to access this reminder");
-        }
-        return reminderMapper.toDTO(reminder);
-    }
-
-    @Transactional
-    public ReminderDTO updateReminder(UUID reminderId, ReminderDTO reminderDTO, UUID userId) {
+    public void updateReminder(UUID reminderId, ReminderDTO reminderDTO, UUID vehicleId) {
         Reminder existingReminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new IllegalArgumentException("Reminder not found with ID: " + reminderId));
 
-        // Validação para garantir que o lembrete pertence ao usuário
-        if (!existingReminder.getUser().getId().equals(userId)) {
-            throw new SecurityException("User not authorized to update this reminder");
+        if (!existingReminder.getVehicle().getUuid().equals(vehicleId)) {
+            throw new SecurityException("Registro de lembrete não pertence ao veículo especificado na URL.");
         }
-
-        // Atualiza os campos permitidos
+        if (reminderDTO.vehicleId() != null && !reminderDTO.vehicleId().equals(existingReminder.getVehicle().getUuid())) {
+            throw new IllegalArgumentException("Não é permitido alterar o veículo associado a um registro de lembrete existente.");
+        }
         existingReminder.setTitle(reminderDTO.title());
         existingReminder.setDescription(reminderDTO.description());
         existingReminder.setType(reminderDTO.type());
@@ -102,54 +81,90 @@ public class ReminderService {
         existingReminder.setStatus(reminderDTO.status() != null ? reminderDTO.status() : existingReminder.getStatus());
         existingReminder.setRecurring(reminderDTO.isRecurring());
 
-        // Atualiza o veículo associado, se informado
         Vehicle vehicle = null;
         if (reminderDTO.vehicleId() != null) {
             vehicle = vehicleRepository.findById(reminderDTO.vehicleId())
                     .orElseThrow(() -> new IllegalArgumentException("Vehicle not found with ID: " + reminderDTO.vehicleId()));
-            // Validação adicional: garantir que o veículo pertence ao usuário
-            if (!vehicle.getUser().getId().equals(userId)) {
-                throw new SecurityException("Vehicle does not belong to the user");
-            }
         }
         existingReminder.setVehicle(vehicle);
 
-        // A lógica @PreUpdate na entidade Reminder deve atualizar reminderDate e updatedAt
-        Reminder updatedReminder = reminderRepository.save(existingReminder);
-        return reminderMapper.toDTO(updatedReminder);
+        reminderRepository.save(existingReminder);
     }
 
-    @Transactional
-    public void deleteReminder(UUID reminderId, UUID userId) {
+    public void deleteReminder(UUID reminderId, UUID vehicleId) {
         Reminder reminder = reminderRepository.findById(reminderId)
-                .orElseThrow(() -> new IllegalArgumentException("Reminder not found with ID: " + reminderId));
-        // Validação para garantir que o lembrete pertence ao usuário
-        if (!reminder.getUser().getId().equals(userId)) {
-            throw new SecurityException("User not authorized to delete this reminder");
+                .orElseThrow(() -> new IllegalArgumentException("Registro de lembrete não encontrado com ID: " + reminderId));
+        if (!reminder.getVehicle().getUuid().equals(vehicleId)) {
+            throw new SecurityException("Não autorizado a deletar este registro de lembrete ou ele não pertence ao veículo especificado.");
         }
+        Vehicle vehicle = reminder.getVehicle();
+        vehicleRepository.save(vehicle);
+
         reminderRepository.deleteById(reminderId);
     }
 
-    // Lógica conceitual para notificação - scheduler real é externo
+    public Reminder findById(UUID id) {
+        return reminderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Reminder not found"));
+    }
+    public Page<ReminderDTO> listReminders(PageRequest pageRequest) {
+        return reminderRepository.findAll(pageRequest)
+                .map(ReminderMapper.INSTANCE::ToReminderDTO);
+    }
+    public Page<ReminderDTO> listRemindersByVehicleAndDate(UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate, PageRequest pageRequest) {
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("Data inicial deve ser anterior à data final.");
+        }
+        return reminderRepository
+                .findByVehicleUuidAndReminderDateBetween(vehicleId, startDate, endDate, pageRequest)
+                .map(ReminderMapper.INSTANCE::ToReminderDTO);
+    }
+
     public void checkAndProcessPendingReminders() {
         LocalDate today = LocalDate.now();
-        // Busca lembretes PENDING cuja data de lembrete (calculada) é hoje ou anterior
-        List<Reminder> pendingNotifications = reminderRepository.findByReminderDateLessThanEqualAndStatus(today, ReminderStatus.PENDING);
+        List<Reminder> pendingNotifications = reminderRepository
+                .findByReminderDateLessThanEqualAndStatus(today, ReminderStatus.PENDING);
 
         if (pendingNotifications.isEmpty()) {
             System.out.println("No pending reminders to process today.");
             return;
         }
 
-        System.out.println("Processing " + pendingNotifications.size() + " pending reminders...");
         for (Reminder reminder : pendingNotifications) {
-            System.out.println("Sending notification for reminder: " + reminder.getTitle() + " (Due: " + reminder.getDueDate() + ")");
-            // Aqui entraria a lógica real de envio de notificação (email, push, etc.)
-
-            // Opcional: Atualizar status para NOTIFIED após envio (se aplicável)
-            // reminder.setStatus(ReminderStatus.NOTIFIED);
-            // reminderRepository.save(reminder);
+            try {
+                sendNotification(reminder);
+                reminder.setStatus(ReminderStatus.NOTIFIED);
+                reminderRepository.save(reminder);
+            } catch (Exception e) {
+                System.err.println("Erro ao enviar notificação: " + reminder.getTitle() + " - " + e.getMessage());
+            }
         }
-        System.out.println("Conceptual check for pending reminders finished. Actual scheduled tasks are disabled in this environment.");
+        System.out.println("All pending reminders processed.");
+    }
+
+    private void sendNotification(Reminder reminder) throws Exception {
+        String senderEmail = reminder.getUser() != null ? reminder.getUser().getEmail() : null;
+        if (senderEmail == null || senderEmail.isBlank()) {
+            throw new IllegalArgumentException("Reminder creator's email is missing.");
+        }
+
+        String recipientEmail = reminder.getUser().getEmail();
+        if (recipientEmail.isBlank()) {
+            throw new IllegalArgumentException("Reminder recipient's email is missing.");
+        }
+
+        Context context = new Context();
+        context.setVariable("title", reminder.getTitle());
+        context.setVariable("dueDate", reminder.getDueDate());
+
+        String htmlBody = templateEngine.process("reminder-email", context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setFrom(senderEmail);
+        helper.setTo(recipientEmail);
+        helper.setSubject("Lembrete: " + reminder.getTitle());
+        helper.setText(htmlBody, true);
+
+        mailSender.send(message);
     }
 }

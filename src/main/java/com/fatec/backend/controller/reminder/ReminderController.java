@@ -1,94 +1,78 @@
 package com.fatec.backend.controller.reminder;
 
 import com.fatec.backend.DTO.reminder.ReminderDTO;
-import com.fatec.backend.response.SuccessResponse; // Importando SuccessResponse
+import com.fatec.backend.model.reminder.Reminder;
 import com.fatec.backend.service.reminder.ReminderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid;
+import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/reminders")
+@RequestMapping("/api/vehicle/{vehicleId}/reminders")
 @RequiredArgsConstructor
 public class ReminderController {
 
     private final ReminderService reminderService;
 
-    // TODO: Substituir mockUserId pela obtenção real do ID do usuário autenticado
-    private final UUID mockUserId = UUID.fromString("d0f6e2d9-4f8c-4f8b-9b8b-0e2f0c6f0a1b");
-
-    /**
-     * Cria um novo lembrete para o usuário autenticado.
-     * Retorna o UUID do lembrete criado.
-     */
-    @PostMapping
-    public ResponseEntity<UUID> createReminder(@Valid @RequestBody ReminderDTO reminderDTO) {
-        ReminderDTO createdReminder = reminderService.createReminder(reminderDTO, mockUserId);
-        return new ResponseEntity<>(createdReminder.id(), HttpStatus.CREATED);
+    @PostMapping("create-reminder/{userId}")
+    public ResponseEntity<UUID> createReminder(@RequestBody ReminderDTO dto,
+                                               @PathVariable UUID vehicleId,
+                                               @PathVariable UUID userId) {
+        UUID id = reminderService.createReminder(dto, vehicleId, userId);
+        return ResponseEntity.ok(id);
     }
 
-    /**
-     * Lista os lembretes do usuário autenticado com paginação.
-     */
-    @GetMapping("/user")
-    public ResponseEntity<Page<ReminderDTO>> getUserReminders(@PageableDefault(size = 10) Pageable pageable) {
-        Page<ReminderDTO> reminders = reminderService.getUserReminders(mockUserId, pageable);
-        // HttpStatus.FOUND não é o ideal para GET. Usar OK.
-        return ResponseEntity.ok(reminders);
+    @PutMapping("/update-reminder{reminderId}")
+    public ResponseEntity<Void> updateReminder(@PathVariable UUID reminderId,
+                                               @RequestBody ReminderDTO dto,
+                                               @PathVariable UUID vehicleId) {
+        reminderService.updateReminder(reminderId, dto, vehicleId);
+        return ResponseEntity.ok().build();
     }
 
-    /**
-     * Busca um lembrete específico pelo ID, verificando se pertence ao usuário autenticado.
-     */
-    @GetMapping("/{reminderId}")
-    public ResponseEntity<ReminderDTO> getReminderById(@PathVariable UUID reminderId) {
-        ReminderDTO reminder = reminderService.getReminderById(reminderId, mockUserId);
-        return ResponseEntity.ok(reminder);
+    @DeleteMapping("/delete-reminder{reminderId}")
+    public ResponseEntity<Void> deleteReminder(@PathVariable UUID reminderId,
+                                               @PathVariable UUID vehicleId) {
+        reminderService.deleteReminder(reminderId, vehicleId);
+        return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Atualiza um lembrete existente.
-     * Retorna SuccessResponse em caso de sucesso.
-     */
-    @PutMapping("/{reminderId}")
-    public ResponseEntity<SuccessResponse> updateReminder(@PathVariable UUID reminderId, @Valid @RequestBody ReminderDTO reminderDTO) {
-        reminderService.updateReminder(reminderId, reminderDTO, mockUserId);
-        SuccessResponse response = new SuccessResponse("Lembrete atualizado com sucesso", reminderId);
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
-     * Deleta um lembrete existente.
-     * Retorna SuccessResponse em caso de sucesso.
-     */
-    @DeleteMapping("/{reminderId}")
-    public ResponseEntity<SuccessResponse> deleteReminder(@PathVariable UUID reminderId) {
-        reminderService.deleteReminder(reminderId, mockUserId);
-        SuccessResponse response = new SuccessResponse("Lembrete deletado com sucesso", reminderId);
-        // Usar OK ou NO_CONTENT é comum para DELETE. SuccessResponse sugere OK.
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
-    /**
-     * Endpoint conceitual para disparar a verificação de lembretes pendentes.
-     * A funcionalidade de agendamento real está desabilitada neste ambiente.
-     */
-    @PostMapping("/check-pending")
-    public ResponseEntity<String> checkPendingReminders() {
-        // Simplificando a resposta
-        try {
-            reminderService.checkAndProcessPendingReminders();
-            return ResponseEntity.ok("Verificação de lembretes pendentes iniciada (conceitual).");
-        } catch (Exception e) {
-            // Adicionar log de erro aqui seria bom
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao verificar lembretes: " + e.getMessage());
+    @GetMapping("/find-by-id-reminder/{id}")
+    public ResponseEntity<?> findReminderById(@PathVariable UUID id) {
+        Optional<Reminder> reminder = Optional.ofNullable(reminderService.findById(id));
+        if (reminder.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(reminder);
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Lembrete não encontrado");
         }
+    }
+
+    @GetMapping("/list-all-reminders")
+    public ResponseEntity<Page<ReminderDTO>> listReminders(@RequestParam int page,
+                                                           @RequestParam int size) {
+        return ResponseEntity.ok(reminderService.listReminders(PageRequest.of(page, size)));
+    }
+
+    @GetMapping("/date-range")
+    public ResponseEntity<Page<ReminderDTO>> listByVehicleAndDate(@PathVariable UUID vehicleId,
+                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
+                                                                  @RequestParam int page,
+                                                                  @RequestParam int size) {
+        return ResponseEntity.ok(reminderService.listRemindersByVehicleAndDate(vehicleId, start, end, PageRequest.of(page, size)));
+    }
+
+    @PostMapping("/check-pending")
+    public ResponseEntity<Void> checkAndNotify() {
+        reminderService.checkAndProcessPendingReminders();
+        return ResponseEntity.ok().build();
     }
 }

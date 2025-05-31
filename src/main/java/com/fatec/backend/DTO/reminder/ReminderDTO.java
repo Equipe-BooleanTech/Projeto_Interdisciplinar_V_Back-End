@@ -2,6 +2,7 @@ package com.fatec.backend.DTO.reminder;
 
 import com.fatec.backend.enums.ReminderStatus;
 import com.fatec.backend.enums.ReminderType;
+import com.fatec.backend.model.User;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -12,9 +13,8 @@ import java.util.UUID;
 
 public record ReminderDTO(
         UUID id,
-        UUID userId, // Will be set from authenticated user in service layer
-        UUID vehicleId, // Optional
-
+        UUID vehicleId,
+        User user,
         @NotBlank(message = "Title is mandatory")
         @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
         String title,
@@ -29,9 +29,8 @@ public record ReminderDTO(
         @FutureOrPresent(message = "Due date must be in the present or future")
         LocalDate dueDate,
 
-        Integer antecedenceDays, // Optional, default will be set in entity or service
-        ReminderStatus status, // Usually set by the system, but can be part of update
+        Integer antecedenceDays,
+        ReminderStatus status,
         boolean isRecurring
-        // Add recurrenceInterval and customRecurrenceDays if needed for creation/update
 ) {}
 

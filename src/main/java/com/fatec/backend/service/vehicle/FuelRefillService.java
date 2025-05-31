@@ -50,7 +50,7 @@ public class FuelRefillService {
             vehicle.setOdometer(fuelRefill.getKmAtRefill());
         }
         vehicleRepository.save(vehicle);
-        return fuelRefillRepository.save(fuelRefill).getId();
+        return fuelRefillRepository.save(fuelRefill).getUuid();
     }
 
     public void updateFuelRefill(UUID fuelRefillId, FuelRefillDTO fuelRefillDTO, UUID vehicleId) {

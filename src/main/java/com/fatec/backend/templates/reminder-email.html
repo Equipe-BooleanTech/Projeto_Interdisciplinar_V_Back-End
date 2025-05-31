@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Lembrete</title></head>
+<body>
+<h2 th:text="'Lembrete: ' + ${title}"></h2>
+<p>Você tem uma tarefa pendente.</p>
+<p><strong>Descrição:</strong> <span th:text="${title}"></span></p>
+<p><strong>Data de vencimento:</strong> <span th:text="${dueDate}"></span></p>
+</body>
+</html>

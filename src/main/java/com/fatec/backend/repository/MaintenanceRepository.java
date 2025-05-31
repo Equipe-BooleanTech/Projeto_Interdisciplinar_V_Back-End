@@ -13,6 +13,10 @@ import java.util.UUID;
 @Repository
 public interface MaintenanceRepository extends JpaRepository<Maintenance, UUID> {
     Optional<Maintenance> findById(UUID id);
-    Page<Maintenance> findByVehicleUuidAndMaintenanceDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end, Pageable pageable);
-}
+    Page<Maintenance> findByVehicleUuidAndDateBetween(
+            UUID vehicleId,
+            LocalDateTime start,
+            LocalDateTime end,
+            Pageable pageable
+    );}
 
