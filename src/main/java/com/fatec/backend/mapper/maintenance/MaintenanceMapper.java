@@ -1,7 +1,7 @@
 package com.fatec.backend.mapper.maintenance;
 
-import com.fatec.backend.DTO.maintenance.MaintenanceDTO;
-import com.fatec.backend.model.maintenance.Maintenance;
+import com.fatec.backend.DTO.vehicle.MaintenanceDTO;
+import com.fatec.backend.model.vehicle.Maintenance;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

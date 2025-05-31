@@ -1,4 +1,4 @@
-package com.fatec.backend.DTO.maintenance;
+package com.fatec.backend.DTO.vehicle;
 
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;

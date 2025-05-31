@@ -1,67 +1,60 @@
-package com.fatec.backend.controller.maintenance;
+package com.fatec.backend.controller.vehicle;
 
-import com.fatec.backend.DTO.maintenance.MaintenanceDTO;
+import com.fatec.backend.DTO.vehicle.MaintenanceDTO;
+import com.fatec.backend.model.vehicle.Maintenance;
 import com.fatec.backend.response.SuccessResponse; // Importando SuccessResponse
-import com.fatec.backend.service.maintenance.MaintenanceService;
+import com.fatec.backend.service.vehicle.MaintenanceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/vehicles/{vehicleId}/maintenances") // Base path por veículo
+@RequestMapping("/api/vehicles/{vehicleId}/maintenances")
 @RequiredArgsConstructor
 public class MaintenanceController {
 
     private final MaintenanceService maintenanceService;
 
-    /**
-     * Cria um novo registro de manutenção para um veículo específico.
-     * Retorna o UUID da manutenção criada.
-     */
-    @PostMapping
+    @PostMapping("/create-maitenance")
     public ResponseEntity<UUID> createMaintenance(@PathVariable UUID vehicleId, @Valid @RequestBody MaintenanceDTO maintenanceDTO) {
-        // Validação básica para garantir consistência entre path e body
         if (maintenanceDTO.vehicleId() != null && !maintenanceDTO.vehicleId().equals(vehicleId)) {
             throw new IllegalArgumentException("O ID do veículo no corpo da requisição não corresponde ao ID na URL.");
         }
         MaintenanceDTO createdMaintenance = maintenanceService.createMaintenance(maintenanceDTO, vehicleId);
-        return new ResponseEntity<>(createdMaintenance.id(), HttpStatus.CREATED);
+        return new ResponseEntity<>(createdMaintenance.id(), HttpStatus.OK);
     }
 
-    /**
-     * Lista os registros de manutenção de um veículo específico com paginação.
-     */
-    @GetMapping
-    public ResponseEntity<Page<MaintenanceDTO>> getVehicleMaintenances(@PathVariable UUID vehicleId, @PageableDefault(size = 10) Pageable pageable) {
-        Page<MaintenanceDTO> maintenances = maintenanceService.getVehicleMaintenances(vehicleId, pageable);
-        return ResponseEntity.ok(maintenances);
+
+    @GetMapping("/list-all-maintenances")
+    public ResponseEntity<Page<MaintenanceDTO>> listAllMaintenances(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Page<MaintenanceDTO> maintenances = maintenanceService.listMaintenances(PageRequest.of(page, size));
+        return new ResponseEntity<>(maintenances, HttpStatus.OK);
     }
 
-    /**
-     * Busca um registro de manutenção específico pelo ID, garantindo que pertence ao veículo da URL.
-     */
-    @GetMapping("/{maintenanceId}")
-    public ResponseEntity<MaintenanceDTO> getMaintenanceById(@PathVariable UUID vehicleId, @PathVariable UUID maintenanceId) {
-        MaintenanceDTO maintenance = maintenanceService.getMaintenanceById(maintenanceId, vehicleId);
-        return ResponseEntity.ok(maintenance);
+    @GetMapping("/find-by-id-maintenance/{id}")
+    public ResponseEntity<?> findMaintenanceById(@PathVariable UUID id) {
+        Optional<Maintenance> maintenance = Optional.ofNullable(maintenanceService.findById(id));
+        if (maintenance.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(maintenance);
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Abastecimento não encontrado");
+        }
     }
 
-    /**
-     * Atualiza um registro de manutenção existente.
-     * Retorna SuccessResponse em caso de sucesso.
-     */
-    @PutMapping("/{maintenanceId}")
+
+
+    @PutMapping("/update-maintenance/{maintenanceId}")
     public ResponseEntity<SuccessResponse> updateMaintenance(@PathVariable UUID vehicleId,
                                                              @PathVariable UUID maintenanceId,
                                                              @Valid @RequestBody MaintenanceDTO maintenanceDTO) {
-        // Validação básica
         if (maintenanceDTO.vehicleId() != null && !maintenanceDTO.vehicleId().equals(vehicleId)) {
             throw new IllegalArgumentException("O ID do veículo no corpo da requisição não corresponde ao ID na URL.");
         }
@@ -70,11 +63,8 @@ public class MaintenanceController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    /**
-     * Deleta um registro de manutenção existente.
-     * Retorna SuccessResponse em caso de sucesso.
-     */
-    @DeleteMapping("/{maintenanceId}")
+
+    @DeleteMapping("/delete-maintenance/{maintenanceId}")
     public ResponseEntity<SuccessResponse> deleteMaintenance(@PathVariable UUID vehicleId, @PathVariable UUID maintenanceId) {
         maintenanceService.deleteMaintenance(maintenanceId, vehicleId);
         SuccessResponse response = new SuccessResponse("Manutenção deletada com sucesso", maintenanceId);
