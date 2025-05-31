@@ -22,7 +22,7 @@ public class ReminderController {
 
     private final ReminderService reminderService;
 
-    @PostMapping("create-reminder/{userId}")
+    @PostMapping("/create-reminder/{userId}")
     public ResponseEntity<UUID> createReminder(@RequestBody ReminderDTO dto,
                                                @PathVariable UUID vehicleId,
                                                @PathVariable UUID userId) {

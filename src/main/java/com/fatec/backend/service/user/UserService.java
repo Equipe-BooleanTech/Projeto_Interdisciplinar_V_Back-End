@@ -25,6 +25,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -64,6 +65,7 @@ public class UserService {
                     .lastname(createUserDTO.lastname())
                     .Phone(createUserDTO.phone())
                     .birthdate(createUserDTO.birthdate())
+                    .createdAt(LocalDateTime.now())
                     .build();
 
             return userRepository.save(user).getId();

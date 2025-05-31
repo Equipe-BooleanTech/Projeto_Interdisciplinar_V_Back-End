@@ -32,7 +32,7 @@ public class VehicleController {
     public ResponseEntity<SuccessResponse> updateVehicle(@PathVariable UUID id, @RequestBody VehicleDTO vehicleDTO) {
         vehicleService.updateVehicle(id, vehicleDTO);
         SuccessResponse response = new SuccessResponse("Veículo Atualizado com sucesso",id);
-        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-vehicle/{id}")
@@ -47,7 +47,7 @@ public class VehicleController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<VehicleDTO> vehicles = vehicleService.listVehicles(PageRequest.of(page, size));
-        return new ResponseEntity<>(vehicles,HttpStatus.FOUND);
+        return new ResponseEntity<>(vehicles,HttpStatus.OK);
     }
 
     @GetMapping("/findbyid-vehicle/{id}")
