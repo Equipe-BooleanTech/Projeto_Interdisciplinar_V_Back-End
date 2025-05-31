@@ -54,8 +54,17 @@ public class VehicleController {
     public ResponseEntity<?> findVehicleById(@PathVariable UUID id) {
         Optional<Vehicle> vehicle = Optional.ofNullable(vehicleService.findById(id));
         if(vehicle.isPresent()){
-            return ResponseEntity.ok(vehicle);
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle.get());
         }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Veículo não encontrado");
+        }
+    }
+    @GetMapping("/findbyplate/{plate}")
+    public ResponseEntity<?> findVehicleByPlate(@PathVariable String plate) {
+        Optional<Vehicle> vehicle = Optional.ofNullable(vehicleService.findbyPlate(plate));
+        if(vehicle.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle.get());
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Veículo não encontrado");
         }
     }
