@@ -29,10 +29,9 @@ public class FuelRefill {
     private double pricePerLiter;
     private double totalCost;
     private double kmAtRefill;
-
+    private Boolean isCompleteTank;
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
-
     private LocalDateTime refillDate;
 
 }
