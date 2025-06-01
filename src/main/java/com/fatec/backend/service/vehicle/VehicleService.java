@@ -40,7 +40,7 @@ public class VehicleService {
                 .type(vehicleDTO.type())
                 .description(vehicleDTO.description())
                 .year(vehicleDTO.year())
-                .odometer(Double.valueOf(vehicleDTO.km()))
+                .odometer(vehicleDTO.odometer())
                 .fuelType(vehicleDTO.fuelType())
                 .fuelCapacity(vehicleDTO.fuelCapacity())
                 .fuelConsumption(vehicleDTO.fuelConsumption())
