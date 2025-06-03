@@ -6,6 +6,7 @@ import com.fatec.backend.DTO.auth.JwtTokenDTO;
 import com.fatec.backend.DTO.auth.LoginUserDTO;
 import com.fatec.backend.DTO.user.UpdateUserDTO;
 import com.fatec.backend.DTO.user.UserDTO;
+import com.fatec.backend.DTO.user.UserUpdateDTO;
 import com.fatec.backend.exception.InvalidCredentialsException;
 import com.fatec.backend.exception.UserNotFoundException;
 import com.fatec.backend.mapper.user.UserMapper;
@@ -24,6 +25,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -63,6 +65,7 @@ public class UserService {
                     .lastname(createUserDTO.lastname())
                     .Phone(createUserDTO.phone())
                     .birthdate(createUserDTO.birthdate())
+                    .createdAt(LocalDateTime.now())
                     .build();
 
             return userRepository.save(user).getId();
@@ -106,5 +109,30 @@ public class UserService {
 
     public User findById(UUID id) {
         return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+    }
+
+    public User updateUser(UUID userId, UserUpdateDTO userUpdateDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + userId));
+
+        if (userUpdateDTO.username() != null && !userUpdateDTO.username().isBlank()) {
+            // Consider adding validation for username uniqueness if it's a requirement
+            user.setUsername(userUpdateDTO.username());
+        }
+        if (userUpdateDTO.name() != null && !userUpdateDTO.name().isBlank()) {
+            user.setName(userUpdateDTO.name());
+        }
+        if (userUpdateDTO.lastname() != null && !userUpdateDTO.lastname().isBlank()) {
+            user.setLastname(userUpdateDTO.lastname());
+        }
+        if (userUpdateDTO.phone() != null && !userUpdateDTO.phone().isBlank()) {
+            user.setPhone(userUpdateDTO.phone());
+        }
+        if (userUpdateDTO.password() != null && !userUpdateDTO.password().isBlank()) {
+            // Ensure new password meets complexity requirements if any
+            user.setPassword(passwordEncoder.encode(userUpdateDTO.password()));
+        }
+
+        return userRepository.save(user);
     }
     }

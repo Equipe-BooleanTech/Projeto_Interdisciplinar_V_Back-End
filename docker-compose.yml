@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14
+    container_name: lembrai-postgres
+    environment:
+      POSTGRES_DB: lembrai
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./postgres-init.sh:/docker-entrypoint-initdb.d/postgres-init.sh
+    networks:
+      - lembrai-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USERNAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: lembrai-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/lembrai
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_PROFILES_ACTIVE: prod
+    networks:
+      - lembrai-network
+
+  nginx:
+    image: nginx:latest
+    container_name: lembrai-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/certbot:/var/www/certbot
+    networks:
+      - lembrai-network
+    depends_on:
+      - backend
+
+  certbot:
+    image: certbot/certbot
+    container_name: lembrai-certbot
+    volumes:
+      - ./nginx/certbot:/var/www/certbot
+      - ./nginx/ssl:/etc/letsencrypt
+    depends_on:
+      - nginx
+
+networks:
+  lembrai-network:
+    driver: bridge
+
+volumes:
+  postgres-data:

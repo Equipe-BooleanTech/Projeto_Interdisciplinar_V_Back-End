@@ -32,7 +32,7 @@ public class VehicleController {
     public ResponseEntity<SuccessResponse> updateVehicle(@PathVariable UUID id, @RequestBody VehicleDTO vehicleDTO) {
         vehicleService.updateVehicle(id, vehicleDTO);
         SuccessResponse response = new SuccessResponse("Veículo Atualizado com sucesso",id);
-        return new ResponseEntity<>(response,HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
     @DeleteMapping("/delete-vehicle/{id}")
@@ -47,15 +47,24 @@ public class VehicleController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Page<VehicleDTO> vehicles = vehicleService.listVehicles(PageRequest.of(page, size));
-        return new ResponseEntity<>(vehicles,HttpStatus.FOUND);
+        return new ResponseEntity<>(vehicles,HttpStatus.OK);
     }
 
     @GetMapping("/findbyid-vehicle/{id}")
     public ResponseEntity<?> findVehicleById(@PathVariable UUID id) {
         Optional<Vehicle> vehicle = Optional.ofNullable(vehicleService.findById(id));
         if(vehicle.isPresent()){
-            return ResponseEntity.ok(vehicle);
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle.get());
         }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Veículo não encontrado");
+        }
+    }
+    @GetMapping("/findbyplate/{plate}")
+    public ResponseEntity<?> findVehicleByPlate(@PathVariable String plate) {
+        Optional<Vehicle> vehicle = Optional.ofNullable(vehicleService.findbyPlate(plate));
+        if(vehicle.isPresent()) {
+            return ResponseEntity.status(HttpStatus.OK).body(vehicle.get());
+        } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Veículo não encontrado");
         }
     }

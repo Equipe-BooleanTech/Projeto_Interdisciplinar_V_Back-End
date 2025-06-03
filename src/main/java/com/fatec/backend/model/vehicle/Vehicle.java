@@ -29,13 +29,16 @@ public class Vehicle {
     private String type;
     private String description;
     private String year;
-
-    @Column(name = "km")
-    private Double km;
+    private Double odometer;
     @Enumerated(EnumType.STRING)
     private FuelType fuelType;
     private Double fuelCapacity;
     private Double fuelConsumption;
+
+    private Double lastKmPerLiter;
+    private Double averageKmPerLiter;
+    private Double totalLitersConsumed;
+    private Double totalKmDriven;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

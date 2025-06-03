@@ -5,6 +5,7 @@ import com.fatec.backend.model.vehicle.Vehicle;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,4 +32,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Vehicle> vehicles;
+    private LocalDateTime createdAt;
 }
