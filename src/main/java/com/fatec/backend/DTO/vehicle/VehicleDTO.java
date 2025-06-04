@@ -18,6 +18,7 @@ public record VehicleDTO(
         FuelType fuelType,
         Double fuelCapacity,
         Double fuelConsumption,
+        Double odometer,
         User userId
 ) {
 }

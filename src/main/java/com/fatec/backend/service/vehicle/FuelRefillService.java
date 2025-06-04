@@ -65,7 +65,6 @@ public class FuelRefillService {
         }
 
         Vehicle vehicle = existingFuelRefill.getVehicle();
-        existingFuelRefill.setStation(fuelRefillDTO.stationId());
         existingFuelRefill.setLiters(fuelRefillDTO.liters());
         existingFuelRefill.setPricePerLiter(fuelRefillDTO.pricePerLiter());
         existingFuelRefill.setTotalCost(fuelRefillDTO.liters() * fuelRefillDTO.pricePerLiter());

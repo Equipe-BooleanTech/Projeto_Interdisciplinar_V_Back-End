@@ -45,7 +45,7 @@ public class GasStationController {
     @GetMapping("/listall-gas-station")
     public ResponseEntity<Page<GasStationDTO>> listAllGasStation(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<GasStationDTO> gasStations = gasStationService.listGasStations(PageRequest.of(page, size));
-        return new ResponseEntity<>(gasStations, HttpStatus.FOUND);
+        return new ResponseEntity<>(gasStations, HttpStatus.OK);
     }
 
     @GetMapping("/findbyid-gas-station/{id}")

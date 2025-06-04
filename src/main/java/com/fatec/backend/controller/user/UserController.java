@@ -8,6 +8,7 @@ import com.fatec.backend.DTO.user.UpdateUserDTO;
 import com.fatec.backend.DTO.user.UserDTO;
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.exception.UserNotFoundException;
+import com.fatec.backend.model.User;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.response.UpdateResponse;
 import com.fatec.backend.service.user.UserService;
@@ -78,5 +79,10 @@ public class UserController {
         return new ResponseEntity<>(vehicles,HttpStatus.FOUND);
     }
 
+    @GetMapping("/find-by-id/{id}")
+    public ResponseEntity<User> listByID(@PathVariable UUID id) {
+        User user = userService.findById(id);
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
 
 }

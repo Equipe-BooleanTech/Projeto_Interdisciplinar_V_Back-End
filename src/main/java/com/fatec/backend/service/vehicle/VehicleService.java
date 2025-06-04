@@ -59,7 +59,7 @@ public class VehicleService {
         vehicle.setType(vehicleDTO.type());
         vehicle.setDescription(vehicleDTO.description());
         vehicle.setYear(vehicleDTO.year());
-        vehicle.setOdometer(Double.valueOf(vehicleDTO.km()));
+        vehicle.setOdometer(vehicleDTO.odometer());
         vehicle.setFuelType(vehicleDTO.fuelType());
         vehicle.setFuelCapacity(vehicleDTO.fuelCapacity());
         vehicle.setFuelConsumption(vehicleDTO.fuelConsumption());

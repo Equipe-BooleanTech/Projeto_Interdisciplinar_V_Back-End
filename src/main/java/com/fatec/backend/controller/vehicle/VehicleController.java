@@ -30,6 +30,7 @@ public class VehicleController {
 
     @PutMapping("/update-vehicle/{id}")
     public ResponseEntity<SuccessResponse> updateVehicle(@PathVariable UUID id, @RequestBody VehicleDTO vehicleDTO) {
+        System.out.println(vehicleDTO);
         vehicleService.updateVehicle(id, vehicleDTO);
         SuccessResponse response = new SuccessResponse("Veículo Atualizado com sucesso",id);
         return new ResponseEntity<>(response,HttpStatus.OK);
