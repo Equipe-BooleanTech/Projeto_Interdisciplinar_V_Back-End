@@ -40,7 +40,7 @@ public class VehicleService {
                 .type(vehicleDTO.type())
                 .description(vehicleDTO.description())
                 .year(vehicleDTO.year())
-                .odometer(vehicleDTO.odometer())
+                .odometer(Double.valueOf(vehicleDTO.odometer()))
                 .fuelType(vehicleDTO.fuelType())
                 .fuelCapacity(vehicleDTO.fuelCapacity())
                 .fuelConsumption(vehicleDTO.fuelConsumption())
@@ -59,7 +59,7 @@ public class VehicleService {
         vehicle.setType(vehicleDTO.type());
         vehicle.setDescription(vehicleDTO.description());
         vehicle.setYear(vehicleDTO.year());
-        vehicle.setOdometer(Double.valueOf(vehicleDTO.km()));
+        vehicle.setOdometer(Double.valueOf(vehicleDTO.odometer()));
         vehicle.setFuelType(vehicleDTO.fuelType());
         vehicle.setFuelCapacity(vehicleDTO.fuelCapacity());
         vehicle.setFuelConsumption(vehicleDTO.fuelConsumption());
