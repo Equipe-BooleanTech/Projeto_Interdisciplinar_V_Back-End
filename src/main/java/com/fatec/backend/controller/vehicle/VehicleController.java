@@ -23,7 +23,6 @@ public class VehicleController {
 
     @PostMapping("/create-vehicle/{userId}")
     public ResponseEntity<UUID> createVehicle(@PathVariable UUID userId, @RequestBody VehicleDTO vehicleDTO) {
-        System.out.println("Recebido JSON: " + vehicleDTO);
         UUID vehicleId = vehicleService.createVehicle(vehicleDTO, userId);
         return ResponseEntity.ok(vehicleId);
     }
@@ -42,11 +41,12 @@ public class VehicleController {
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
 
-    @GetMapping("/listall-vehicle")
+    @GetMapping("/listall-vehicle/{userId}")
     public ResponseEntity<Page<VehicleDTO>> listAllVehicle(
+            @PathVariable UUID userId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<VehicleDTO> vehicles = vehicleService.listVehicles(PageRequest.of(page, size));
+        Page<VehicleDTO> vehicles = vehicleService.listVehicles(userId,PageRequest.of(page, size));
         return new ResponseEntity<>(vehicles,HttpStatus.OK);
     }
 

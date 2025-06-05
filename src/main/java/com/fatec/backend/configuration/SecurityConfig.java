@@ -35,7 +35,7 @@ public class SecurityConfig {
                                 "/api/vehicle/create-vehicle/{userId}",
                                 "/api/vehicle/update-vehicle/{id}",
                                 "/api/vehicle/delete-vehicle/{id}",
-                                "/api/vehicle/listall-vehicle",
+                                "/api/vehicle/listall-vehicle/{userId}",
                                 "/api/vehicle/findbyid-vehicle/{id}",
                                 "/api/vehicle/findbyplate/{plate}",
                                 "/api/users/create-user",
@@ -49,10 +49,9 @@ public class SecurityConfig {
                                 "/api/vehicle/fuel-refill/new-fuel-refill/{vehicleID}/{stationId}",
                                 "/api/vehicle/fuel-refill/update-fuel-refill/{fuelRefillId}/{vehicleID}",
                                 "/api/vehicle/fuel-refill/delete-refill/{id}/{vehicleID}",
-                                "/api/vehicle/fuel-refill/list-all-fuel-refill",
+                                "/api/vehicle/fuel-refill/list-all-fuel-refill/{vehicleId}",
                                 "/api/vehicle/fuel-refill/find-by-id-fuel-refill/{id}",
-                                "/api/vehicle/fuel-refill/by-vehicle-and-date",
-                                "/api/vehicle/fuel-refill/by-vehicle-date-fueltype",
+                                "/api/vehicle/fuel-refill/list-fuel-refill-by-period/{vehicleID}",
                                 "/api/gasstation/create-gas-station",
                                 "/api/gasstation/update-gas-station/{id}",
                                 "/api/gasstation/delete-gas-station/{id}",
@@ -62,14 +61,15 @@ public class SecurityConfig {
                                 "/api/vehicle/{vehicleId}/reminders/update-reminder{reminderId}",
                                 "/api/vehicle/{vehicleId}/reminders/delete-reminder{reminderId}",
                                 "/api/vehicle/{vehicleId}/reminders/find-by-id-reminder/{id}",
-                                "/api/vehicle/{vehicleId}/reminders/list-all-reminders",
-                                "/api/vehicle/{vehicleId}/reminders/date-range",
+                                "/api/vehicle/{vehicleId}/reminders/list-all-reminders/{userId}",
+                                "/api/vehicle/{vehicleId}/reminders/list-reminder-by-period",
                                 "/api/vehicle/{vehicleId}/reminders/check-pending",
                                 "/api/vehicles/{vehicleId}/maintenances/create-maitenance",
                                 "/api/vehicles/{vehicleId}/maintenances/list-all-maintenances",
                                 "/api/vehicles/{vehicleId}/maintenances/find-by-id-maintenance/{id}",
                                 "/api/vehicles/{vehicleId}/maintenances/update-maintenance/{maintenanceId}",
-                                "/api/vehicles/{vehicleId}/maintenances/delete-maintenance/{maintenanceId}"
+                                "/api/vehicles/{vehicleId}/maintenances/delete-maintenance/{maintenanceId}",
+                                "/api/vehicles/{vehicleId}/maintenances/list-maintenance-by-period"
                         ).permitAll())
                 .addFilterBefore(userAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

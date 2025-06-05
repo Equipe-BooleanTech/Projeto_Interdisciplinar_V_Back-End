@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Vehicle {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID uuid;
+    private UUID id;
 
     @NotBlank(message = "A placa é obrigatória")
     private String plate;

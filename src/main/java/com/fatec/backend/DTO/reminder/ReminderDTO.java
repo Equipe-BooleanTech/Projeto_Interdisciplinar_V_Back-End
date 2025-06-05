@@ -9,12 +9,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record ReminderDTO(
         UUID id,
         UUID vehicleId,
-        User user,
+        UUID userId,
         @NotBlank(message = "Title is mandatory")
         @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
         String title,
@@ -31,6 +32,7 @@ public record ReminderDTO(
 
         Integer antecedenceDays,
         ReminderStatus status,
-        boolean isRecurring
+        boolean isRecurring,
+        LocalDateTime createdAt
 ) {}
 

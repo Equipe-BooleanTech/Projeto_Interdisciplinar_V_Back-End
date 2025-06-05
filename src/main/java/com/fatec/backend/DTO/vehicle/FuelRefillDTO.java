@@ -10,8 +10,8 @@ import java.util.UUID;
 
 public record FuelRefillDTO(
         UUID id,
-        Vehicle vehicleId,
-        GasStation stationId,
+        UUID vehicleId,
+        UUID stationId,
         double liters,
         double pricePerLiter,
         double totalCost,

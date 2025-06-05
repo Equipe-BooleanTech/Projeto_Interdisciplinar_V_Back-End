@@ -22,7 +22,7 @@ public class Maintenance {
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
     @Column(nullable = false)
-    private LocalDate date;
+    private LocalDateTime date;
     @Column(nullable = false)
     private Double odometer;
     @Column(nullable = false)

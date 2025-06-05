@@ -1,6 +1,9 @@
 package com.fatec.backend.controller.reminder;
 
 import com.fatec.backend.DTO.reminder.ReminderDTO;
+import com.fatec.backend.DTO.vehicle.DateRangeDTO;
+import com.fatec.backend.DTO.vehicle.FuelRefillDTO;
+import com.fatec.backend.DTO.vehicle.TimeSummaryDTO;
 import com.fatec.backend.model.reminder.Reminder;
 import com.fatec.backend.service.reminder.ReminderService;
 import lombok.RequiredArgsConstructor;
@@ -55,19 +58,26 @@ public class ReminderController {
         }
     }
 
-    @GetMapping("/list-all-reminders")
-    public ResponseEntity<Page<ReminderDTO>> listReminders(@RequestParam int page,
-                                                           @RequestParam int size) {
-        return ResponseEntity.ok(reminderService.listReminders(PageRequest.of(page, size)));
+    @GetMapping("/list-all-reminders/{userId}")
+    public ResponseEntity<Page<ReminderDTO>> listReminders(@PathVariable UUID vehicleId,@PathVariable UUID userId,
+                                                           @RequestParam(defaultValue = "0") int page,
+                                                           @RequestParam(defaultValue = "10") int size) {
+        Page<ReminderDTO> reminderDTOS = reminderService.listReminders(userId,vehicleId, PageRequest.of(page, size));
+        return new ResponseEntity<>(reminderDTOS, HttpStatus.OK);
     }
 
-    @GetMapping("/date-range")
-    public ResponseEntity<Page<ReminderDTO>> listByVehicleAndDate(@PathVariable UUID vehicleId,
-                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
-                                                                  @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end,
-                                                                  @RequestParam int page,
-                                                                  @RequestParam int size) {
-        return ResponseEntity.ok(reminderService.listRemindersByVehicleAndDate(vehicleId, start, end, PageRequest.of(page, size)));
+    @GetMapping("/list-reminder-by-period")
+    public ResponseEntity<?> getByPeriod(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType,
+            @PathVariable UUID vehicleId
+    ){
+        TimeSummaryDTO reminders = reminderService.ListRemindersByDateRange(vehicleId,dateRangeDTO);
+        if(reminders.data().isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NENHUM LEMBRETE ENCONTRADO NESTE PERIODO");
+        }else {
+            return ResponseEntity.status(HttpStatus.OK).body(reminders);
+        }
     }
 
     @PostMapping("/check-pending")
