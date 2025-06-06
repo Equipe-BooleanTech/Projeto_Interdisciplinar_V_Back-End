@@ -1,12 +1,9 @@
 package com.fatec.backend.service.user;
 
 
-import com.fatec.backend.DTO.user.CreateUserDTO;
+import com.fatec.backend.DTO.user.*;
 import com.fatec.backend.DTO.auth.JwtTokenDTO;
 import com.fatec.backend.DTO.auth.LoginUserDTO;
-import com.fatec.backend.DTO.user.UpdateUserDTO;
-import com.fatec.backend.DTO.user.UserDTO;
-import com.fatec.backend.DTO.user.UserUpdateDTO;
 import com.fatec.backend.exception.InvalidCredentialsException;
 import com.fatec.backend.exception.UserNotFoundException;
 import com.fatec.backend.mapper.user.UserMapper;
@@ -181,11 +178,21 @@ public class UserService {
         mailSender.send(message);
     }
 
-    public void redefinirSenha(String token, String password) {
+    public void redefinirSenhaEsquecida(String token, String password) {
         String email = jwtTokenService.verifyPasswordResetToken(token);
         Optional<User> usuario = userRepository.findByEmail(email);
         if (usuario.isEmpty()) throw new IllegalArgumentException("Usuário não encontrado com este token.");
         usuario.get().setPassword(passwordEncoder.encode(password));
         userRepository.save(usuario.get());
+    }
+
+    public void redefinirSenha(UUID id, PasswordDTO passwordDTO) {
+        Optional<User> usuario = userRepository.findById(id);
+        if (usuario.isEmpty()) throw new IllegalArgumentException("User not found");
+        if(usuario.get().getPassword().equals(passwordEncoder.encode(passwordDTO.oldPassword()))){
+            usuario.get().setPassword(passwordEncoder.encode(passwordDTO.newPassword()));
+        }else {
+            throw new RuntimeException("Senha incorreta");
+        }
     }
     }
