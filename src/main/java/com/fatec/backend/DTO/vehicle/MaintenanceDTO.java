@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record MaintenanceDTO(
@@ -14,7 +15,7 @@ public record MaintenanceDTO(
         UUID vehicleId,
 
         @NotNull(message = "Maintenance date is mandatory")
-        LocalDate date,
+        LocalDateTime date,
 
         @NotNull(message = "Odometer reading is mandatory")
         @PositiveOrZero(message = "Odometer reading must be positive or zero")

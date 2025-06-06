@@ -17,7 +17,8 @@ import java.util.UUID;
 @Mapper(componentModel = "spring")
 public interface ReminderMapper {
     ReminderMapper INSTANCE = Mappers.getMapper(ReminderMapper.class);
-
+    @Mapping(source = "vehicle.id", target = "vehicleId")
+    @Mapping(source = "user.id", target = "userId")
     ReminderDTO ToReminderDTO(Reminder reminder);
     Reminder ToReminder(ReminderDTO reminderDTO);
 }

@@ -1,9 +1,14 @@
 package com.fatec.backend.service.vehicle;
 
+import com.fatec.backend.DTO.vehicle.DateRangeDTO;
 import com.fatec.backend.DTO.vehicle.FuelRefillDTO;
+import com.fatec.backend.DTO.vehicle.MaintenanceDTO;
+import com.fatec.backend.DTO.vehicle.TimeSummaryDTO;
+import com.fatec.backend.mapper.maintenance.MaintenanceMapper;
 import com.fatec.backend.mapper.vehicle.FuelRefillMapper;
 import com.fatec.backend.model.vehicle.FuelRefill;
 import com.fatec.backend.model.vehicle.GasStation;
+import com.fatec.backend.model.vehicle.Maintenance;
 import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.repository.FuelRefillRepository;
 import com.fatec.backend.repository.GasStationRepository;
@@ -15,6 +20,8 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,22 +57,23 @@ public class FuelRefillService {
             vehicle.setOdometer(fuelRefill.getKmAtRefill());
         }
         vehicleRepository.save(vehicle);
-        return fuelRefillRepository.save(fuelRefill).getUuid();
+        return fuelRefillRepository.save(fuelRefill).getId();
     }
 
     public void updateFuelRefill(UUID fuelRefillId, FuelRefillDTO fuelRefillDTO, UUID vehicleId) {
         FuelRefill existingFuelRefill = fuelRefillRepository.findById(fuelRefillId)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de abastecimento não encontrado com ID: " + fuelRefillId));
 
-        if (!existingFuelRefill.getVehicle().getUuid().equals(vehicleId)) {
+        if (!existingFuelRefill.getVehicle().getId().equals(vehicleId)) {
             throw new SecurityException("Registro de abastecimento não pertence ao veículo especificado na URL.");
         }
-        if (fuelRefillDTO.vehicleId() != null && !fuelRefillDTO.vehicleId().equals(existingFuelRefill.getVehicle().getUuid())) {
+        if (fuelRefillDTO.vehicleId() != null && !fuelRefillDTO.vehicleId().equals(existingFuelRefill.getVehicle().getId())) {
             throw new IllegalArgumentException("Não é permitido alterar o veículo associado a um registro de abastecimento existente.");
         }
+        GasStation station = gasStationRepository.findById(fuelRefillDTO.stationId()).orElseThrow(() -> new IllegalArgumentException("Posto de gasolina nao encontrado"));
 
         Vehicle vehicle = existingFuelRefill.getVehicle();
-        existingFuelRefill.setStation(fuelRefillDTO.stationId());
+        existingFuelRefill.setStation(station);
         existingFuelRefill.setLiters(fuelRefillDTO.liters());
         existingFuelRefill.setPricePerLiter(fuelRefillDTO.pricePerLiter());
         existingFuelRefill.setTotalCost(fuelRefillDTO.liters() * fuelRefillDTO.pricePerLiter());
@@ -86,7 +94,7 @@ public class FuelRefillService {
     public void deleteFuelRefill(UUID fuelRefillId, UUID vehicleId) {
         FuelRefill fuelRefill = fuelRefillRepository.findById(fuelRefillId)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de abastecimento não encontrado com ID: " + fuelRefillId));
-        if (!fuelRefill.getVehicle().getUuid().equals(vehicleId)) {
+        if (!fuelRefill.getVehicle().getId().equals(vehicleId)) {
             throw new SecurityException("Não autorizado a deletar este registro de abastecimento ou ele não pertence ao veículo especificado.");
         }
 
@@ -102,27 +110,23 @@ public class FuelRefillService {
     public FuelRefill findById(UUID id) {
         return fuelRefillRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
     }
-    public Page<FuelRefillDTO> listRefills(PageRequest pageRequest) {
-        return fuelRefillRepository.findAll(pageRequest)
-                .map(FuelRefillMapper.INSTANCE::toFuelRefillDTO);
-    }
-    public Page<FuelRefillDTO> listRefillsByVehicleAndDate(UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate, PageRequest pageRequest) {
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Data inicial deve ser anterior à data final.");
-        }
-        return fuelRefillRepository
-                .findByVehicleUuidAndRefillDateBetween(vehicleId, startDate, endDate, pageRequest)
+    public Page<FuelRefillDTO> listRefills(UUID vehicleId, PageRequest pageRequest) {
+        return fuelRefillRepository.findAllByVehicleId(vehicleId, pageRequest)
                 .map(FuelRefillMapper.INSTANCE::toFuelRefillDTO);
     }
 
-    public Page<FuelRefillDTO> listRefillsByVehicleDateAndFuelType(UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate, String fuelType, PageRequest pageRequest) {
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Data inicial deve ser anterior à data final.");
-        }
-        return fuelRefillRepository
-                .findByVehicleUuidAndRefillDateBetweenAndFuelType(vehicleId, startDate, endDate, fuelType, pageRequest)
-                .map(FuelRefillMapper.INSTANCE::toFuelRefillDTO);
+    public TimeSummaryDTO listFuelRefillByDateRangeAndVehicle(UUID vehicleId, DateRangeDTO dateRangeDTO) {
+        List<FuelRefill> data = fuelRefillRepository.findAllByVehicleIdAndRefillDateBetween(
+                vehicleId, dateRangeDTO.startDate(), dateRangeDTO.endDate()
+        );
+
+        List<FuelRefillDTO> refills = data.stream()
+                .map(FuelRefillMapper.INSTANCE::toFuelRefillDTO)
+                .toList();
+
+        return new TimeSummaryDTO(Collections.singletonList(refills), refills.size());
     }
+
     private void calculateAndSetKmPerLiter(FuelRefill currentRefill, Vehicle vehicle) {
         Optional<FuelRefill> previousRefillOpt = fuelRefillRepository.findTopByVehicleOrderByRefillDateDesc(vehicle);
 

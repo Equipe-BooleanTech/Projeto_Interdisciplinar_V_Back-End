@@ -1,6 +1,7 @@
 package com.fatec.backend.repository;
 
 import com.fatec.backend.model.vehicle.FuelRefill;
+import com.fatec.backend.model.vehicle.Maintenance;
 import com.fatec.backend.model.vehicle.Vehicle;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ import java.util.UUID;
 public interface FuelRefillRepository extends JpaRepository<FuelRefill, UUID> {
     Optional<FuelRefill> findById(UUID id);
     Optional<FuelRefill> findTopByVehicleOrderByRefillDateDesc(Vehicle vehicle);
-    Page<FuelRefill> findByRefillDateBetween(LocalDateTime start, LocalDateTime end, Pageable pageable);
-    Page<FuelRefill> findByVehicleUuidAndRefillDateBetween(UUID uuid, LocalDateTime start, LocalDateTime end, Pageable pageable);
-    Page<FuelRefill> findByVehicleUuidAndRefillDateBetweenAndFuelType(UUID uuid, LocalDateTime start, LocalDateTime end, String fuelType, Pageable pageable);
+    List<FuelRefill> findAllByVehicleIdAndRefillDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
+    Page<FuelRefill> findAllByVehicleId(UUID vehicleId, Pageable pageable);
+
 }

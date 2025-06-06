@@ -1,13 +1,18 @@
 package com.fatec.backend.service.reminder;
 
 import com.fatec.backend.DTO.reminder.ReminderDTO;
+import com.fatec.backend.DTO.vehicle.DateRangeDTO;
 import com.fatec.backend.DTO.vehicle.FuelRefillDTO;
+import com.fatec.backend.DTO.vehicle.MaintenanceDTO;
+import com.fatec.backend.DTO.vehicle.TimeSummaryDTO;
 import com.fatec.backend.enums.ReminderStatus;
+import com.fatec.backend.mapper.maintenance.MaintenanceMapper;
 import com.fatec.backend.mapper.reminder.ReminderMapper;
 import com.fatec.backend.mapper.vehicle.FuelRefillMapper;
 import com.fatec.backend.model.User;
 import com.fatec.backend.model.reminder.Reminder;
 import com.fatec.backend.model.vehicle.FuelRefill;
+import com.fatec.backend.model.vehicle.Maintenance;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +64,7 @@ public class ReminderService {
                 .isRecurring(reminderDTO.isRecurring())
                 .vehicle(vehicle)
                 .user(user)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         return reminderRepository.save(reminder).getUuid();
@@ -67,10 +74,10 @@ public class ReminderService {
         Reminder existingReminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new IllegalArgumentException("Reminder not found with ID: " + reminderId));
 
-        if (!existingReminder.getVehicle().getUuid().equals(vehicleId)) {
+        if (!existingReminder.getVehicle().getId().equals(vehicleId)) {
             throw new SecurityException("Registro de lembrete não pertence ao veículo especificado na URL.");
         }
-        if (reminderDTO.vehicleId() != null && !reminderDTO.vehicleId().equals(existingReminder.getVehicle().getUuid())) {
+        if (reminderDTO.vehicleId() != null && !reminderDTO.vehicleId().equals(existingReminder.getVehicle().getId())) {
             throw new IllegalArgumentException("Não é permitido alterar o veículo associado a um registro de lembrete existente.");
         }
         existingReminder.setTitle(reminderDTO.title());
@@ -94,7 +101,7 @@ public class ReminderService {
     public void deleteReminder(UUID reminderId, UUID vehicleId) {
         Reminder reminder = reminderRepository.findById(reminderId)
                 .orElseThrow(() -> new IllegalArgumentException("Registro de lembrete não encontrado com ID: " + reminderId));
-        if (!reminder.getVehicle().getUuid().equals(vehicleId)) {
+        if (!reminder.getVehicle().getId().equals(vehicleId)) {
             throw new SecurityException("Não autorizado a deletar este registro de lembrete ou ele não pertence ao veículo especificado.");
         }
         Vehicle vehicle = reminder.getVehicle();
@@ -106,17 +113,17 @@ public class ReminderService {
     public Reminder findById(UUID id) {
         return reminderRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Reminder not found"));
     }
-    public Page<ReminderDTO> listReminders(PageRequest pageRequest) {
-        return reminderRepository.findAll(pageRequest)
+    public Page<ReminderDTO> listReminders(UUID userId,UUID vehicleId, PageRequest pageRequest) {
+        return reminderRepository.findAllByUserIdAndVehicleId(userId,vehicleId,pageRequest)
                 .map(ReminderMapper.INSTANCE::ToReminderDTO);
     }
-    public Page<ReminderDTO> listRemindersByVehicleAndDate(UUID vehicleId, LocalDateTime startDate, LocalDateTime endDate, PageRequest pageRequest) {
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Data inicial deve ser anterior à data final.");
-        }
-        return reminderRepository
-                .findByVehicleUuidAndReminderDateBetween(vehicleId, startDate, endDate, pageRequest)
-                .map(ReminderMapper.INSTANCE::ToReminderDTO);
+
+    public TimeSummaryDTO ListRemindersByDateRange(UUID vehicleId, DateRangeDTO dateRangeDTO) {
+        List<Reminder> data = reminderRepository.findAllByVehicleIdAndCreatedAtBetween(vehicleId,dateRangeDTO.startDate(), dateRangeDTO.endDate());
+        List<ReminderDTO> reminderDTOList = data.stream()
+                .map(ReminderMapper.INSTANCE::ToReminderDTO)
+                .toList();
+        return new TimeSummaryDTO(Collections.singletonList(reminderDTOList), reminderDTOList.size());
     }
 
     public void checkAndProcessPendingReminders() {

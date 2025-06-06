@@ -1,12 +1,9 @@
 package com.fatec.backend.service.user;
 
 
-import com.fatec.backend.DTO.user.CreateUserDTO;
+import com.fatec.backend.DTO.user.*;
 import com.fatec.backend.DTO.auth.JwtTokenDTO;
 import com.fatec.backend.DTO.auth.LoginUserDTO;
-import com.fatec.backend.DTO.user.UpdateUserDTO;
-import com.fatec.backend.DTO.user.UserDTO;
-import com.fatec.backend.DTO.user.UserUpdateDTO;
 import com.fatec.backend.exception.InvalidCredentialsException;
 import com.fatec.backend.exception.UserNotFoundException;
 import com.fatec.backend.mapper.user.UserMapper;
@@ -15,16 +12,23 @@ import com.fatec.backend.repository.UserRepository;
 import com.fatec.backend.configuration.SecurityConfig;
 import com.fatec.backend.model.User;
 import com.fatec.backend.service.auth.JwtTokenService;
+import jakarta.mail.internet.MimeMessage;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -38,6 +42,8 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenService jwtTokenService;
     private final PasswordEncoder passwordEncoder;
+    private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
     public UUID buscarIdPorEmail(String email) {
         User user = userRepository.findByEmail(email)
@@ -66,6 +72,7 @@ public class UserService {
                     .Phone(createUserDTO.phone())
                     .birthdate(createUserDTO.birthdate())
                     .createdAt(LocalDateTime.now())
+                    .image(null)
                     .build();
 
             return userRepository.save(user).getId();
@@ -108,7 +115,7 @@ public class UserService {
     }
 
     public User findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     public User updateUser(UUID userId, UserUpdateDTO userUpdateDTO) {
@@ -128,11 +135,64 @@ public class UserService {
         if (userUpdateDTO.phone() != null && !userUpdateDTO.phone().isBlank()) {
             user.setPhone(userUpdateDTO.phone());
         }
-        if (userUpdateDTO.password() != null && !userUpdateDTO.password().isBlank()) {
-            // Ensure new password meets complexity requirements if any
-            user.setPassword(passwordEncoder.encode(userUpdateDTO.password()));
-        }
-
         return userRepository.save(user);
+    }
+
+    public User uploadImagem(UUID id, MultipartFile file) throws IOException {
+        User user =userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user == null) {
+            return null;
+        }
+        user.setImage(file.getBytes());
+        return userRepository.save(user);
+    }
+
+
+    public byte[] getImagem(UUID id) {
+        User user =userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user == null || user.getImage() == null) {
+            return null;
+        }
+        return user.getImage();
+    }
+
+    public void solicitarRecuperacaoSenha(String email) throws Exception {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isEmpty()) throw new IllegalArgumentException("Usuário não encontrado com este email.");
+
+        String token = jwtTokenService.generatePasswordResetToken(email);
+        String link = "http://localhost:8080/api/users/resetar-senha?token=" + token;
+
+        Context context = new Context();
+        context.setVariable("nome", user.get().getName());
+        context.setVariable("link", link);
+
+        String htmlBody = templateEngine.process("password-recovery", context);
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+        helper.setTo(user.get().getEmail());
+        helper.setSubject("Recuperação de Senha");
+        helper.setText(htmlBody, true);
+
+        mailSender.send(message);
+    }
+
+    public void redefinirSenhaEsquecida(String token, String password) {
+        String email = jwtTokenService.verifyPasswordResetToken(token);
+        Optional<User> usuario = userRepository.findByEmail(email);
+        if (usuario.isEmpty()) throw new IllegalArgumentException("Usuário não encontrado com este token.");
+        usuario.get().setPassword(passwordEncoder.encode(password));
+        userRepository.save(usuario.get());
+    }
+
+    public void redefinirSenha(UUID id, PasswordDTO passwordDTO) {
+        Optional<User> usuario = userRepository.findById(id);
+        if (usuario.isEmpty()) throw new IllegalArgumentException("User not found");
+        if(usuario.get().getPassword().equals(passwordEncoder.encode(passwordDTO.oldPassword()))){
+            usuario.get().setPassword(passwordEncoder.encode(passwordDTO.newPassword()));
+        }else {
+            throw new RuntimeException("Senha incorreta");
+        }
     }
     }

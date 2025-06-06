@@ -1,6 +1,8 @@
 package com.fatec.backend.controller.vehicle;
 
+import com.fatec.backend.DTO.vehicle.DateRangeDTO;
 import com.fatec.backend.DTO.vehicle.MaintenanceDTO;
+import com.fatec.backend.DTO.vehicle.TimeSummaryDTO;
 import com.fatec.backend.model.vehicle.Maintenance;
 import com.fatec.backend.response.SuccessResponse; // Importando SuccessResponse
 import com.fatec.backend.service.vehicle.MaintenanceService;
@@ -34,8 +36,8 @@ public class MaintenanceController {
 
 
     @GetMapping("/list-all-maintenances")
-    public ResponseEntity<Page<MaintenanceDTO>> listAllMaintenances(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        Page<MaintenanceDTO> maintenances = maintenanceService.listMaintenances(PageRequest.of(page, size));
+    public ResponseEntity<Page<MaintenanceDTO>> listAllMaintenances(@PathVariable UUID vehicleId,@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Page<MaintenanceDTO> maintenances = maintenanceService.listMaintenances(vehicleId,PageRequest.of(page, size));
         return new ResponseEntity<>(maintenances, HttpStatus.OK);
     }
 
@@ -70,4 +72,20 @@ public class MaintenanceController {
         SuccessResponse response = new SuccessResponse("Manutenção deletada com sucesso", maintenanceId);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/list-maintenance-by-period")
+    public ResponseEntity<?> getByPeriod(
+            @RequestBody DateRangeDTO dateRangeDTO,
+            @RequestParam(defaultValue = "monthly") String groupingType,
+            @PathVariable UUID vehicleId
+    ){
+        TimeSummaryDTO maintenances = maintenanceService.ListMaintenanceByDateRange(vehicleId,dateRangeDTO);
+        if(maintenances.data().isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("NENHUMA MANUTENÇÃO ENCONTRADA NESTE PERIODO");
+        }else {
+            return ResponseEntity.status(HttpStatus.OK).body(maintenances);
+        }
+    }
+
+
 }

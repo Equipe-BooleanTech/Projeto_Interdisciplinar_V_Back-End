@@ -12,6 +12,8 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
+import static java.time.Instant.now;
+
 @Service
 public class JwtTokenService {
     @Value("${token.jwt.secret.key}")
@@ -45,6 +47,34 @@ public class JwtTokenService {
             throw new JWTVerificationException("Token invalido ou expirado");
         }
     }
+    public String generatePasswordResetToken(String email) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
+            return JWT.create()
+                    .withIssuer(issuer)
+                    .withSubject(email)
+                    .withClaim("type", "password-reset")
+                    .withIssuedAt(now())
+                    .withExpiresAt(dataExpiracaoRecuperacao())
+                    .sign(algorithm);
+        } catch (JWTCreationException e) {
+            throw new JWTCreationException("Erro ao gerar token de recuperação.", e);
+        }
+    }
+
+    public String verifyPasswordResetToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
+            return JWT.require(algorithm)
+                    .withIssuer(issuer)
+                    .withClaim("type", "password-reset")
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException e) {
+            throw new JWTVerificationException("Token de recuperação inválido ou expirado.");
+        }
+    }
     private Instant dataCriacao(){
         return ZonedDateTime
                 .now(ZoneId.of("America/Sao_Paulo"))
@@ -54,6 +84,12 @@ public class JwtTokenService {
         return ZonedDateTime
                 .now(ZoneId.of("America/Sao_Paulo"))
                 .plusHours(10)
+                .toInstant();
+    }
+    private Instant dataExpiracaoRecuperacao(){
+        return ZonedDateTime
+                .now(ZoneId.of("America/Sao_Paulo"))
+                .plusMinutes(20)
                 .toInstant();
     }
 }

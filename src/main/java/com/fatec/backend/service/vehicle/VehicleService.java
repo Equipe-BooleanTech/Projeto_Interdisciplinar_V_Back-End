@@ -19,8 +19,6 @@ public class VehicleService {
     private final UserRepository userRepository;
 
     public UUID createVehicle(VehicleDTO vehicleDTO, UUID userId) {
-        System.out.println("Recebido: " + vehicleDTO);
-
         if (vehicleRespository.findByPlate(vehicleDTO.plate()).isPresent()) {
             throw new IllegalArgumentException("Placa já cadastrada!");
         }
@@ -47,7 +45,7 @@ public class VehicleService {
                 .user(user)
                 .build();
 
-        return vehicleRespository.save(vehicle).getUuid();
+        return vehicleRespository.save(vehicle).getId();
     }
 
     public void updateVehicle(UUID id,VehicleDTO vehicleDTO) {
@@ -75,8 +73,8 @@ public class VehicleService {
         vehicleRespository.deleteById(id);
     }
 
-    public Page<VehicleDTO> listVehicles(PageRequest pageRequest) {
-        return vehicleRespository.findAll(pageRequest)
+    public Page<VehicleDTO> listVehicles(UUID userId,PageRequest pageRequest) {
+        return vehicleRespository.findAllByUserId(userId,pageRequest)
                 .map(VehicleMapper.INSTANCE::ToVehicleDTO);
     }
 
