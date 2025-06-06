@@ -102,4 +102,32 @@ public class UserController {
         return ResponseEntity.ok("Imagem atualizada com sucesso!");
     }
 
+    @PostMapping("/recuperar-senha")
+    public ResponseEntity<String> solicitarRecuperacaoSenha(@RequestParam String email) {
+        try {
+            userService.solicitarRecuperacaoSenha(email);
+            return ResponseEntity.ok("Email de recuperação enviado com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/resetar-senha")
+    public ResponseEntity<String> redefinirSenha(@RequestParam String token, @RequestParam String novaSenha) {
+        try {
+            userService.redefinirSenha(token, novaSenha);
+            return ResponseEntity.ok("Senha redefinida com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/get-token/{id}")
+    public ResponseEntity<?> getToken(@PathVariable UUID id, @RequestParam LoginUserDTO loginUserDTO) {
+        User user = userService.findById(id);
+        JwtTokenDTO tokenDTO = userService.authenticarUsuario(loginUserDTO);
+        String token = tokenDTO.token();
+        return ResponseEntity.ok(token);
+
+    }
 }
