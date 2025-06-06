@@ -42,6 +42,7 @@ public class SecurityConfig {
                                 "/api/users/delete/{id}",
                                 "/api/users/update/{id}",
                                 "/api/users/listall-users",
+                                "/api/users/list-by-id/{id}",
                                 "/api/fipe/marcas",
                                 "/api/fipe/marcas/{marcaId}/modelos",
                                 "/api/fipe/marcas/{marcaId}/modelos/{modeloId}/anos",

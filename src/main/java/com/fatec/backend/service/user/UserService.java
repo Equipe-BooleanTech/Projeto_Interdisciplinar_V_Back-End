@@ -108,7 +108,7 @@ public class UserService {
     }
 
     public User findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Vehicle not found"));
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 
     public User updateUser(UUID userId, UserUpdateDTO userUpdateDTO) {

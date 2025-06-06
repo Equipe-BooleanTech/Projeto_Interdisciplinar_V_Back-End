@@ -8,6 +8,8 @@ import com.fatec.backend.DTO.user.UpdateUserDTO;
 import com.fatec.backend.DTO.user.UserDTO;
 import com.fatec.backend.DTO.vehicle.VehicleDTO;
 import com.fatec.backend.exception.UserNotFoundException;
+import com.fatec.backend.model.User;
+import com.fatec.backend.model.vehicle.Vehicle;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.response.UpdateResponse;
 import com.fatec.backend.service.user.UserService;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
 import java.util.UUID;
 @AllArgsConstructor
 @RestController
@@ -76,6 +79,16 @@ public class UserController {
             @RequestParam(defaultValue = "10") int size) {
         Page<UserDTO> vehicles = userService.listUsers(PageRequest.of(page, size));
         return new ResponseEntity<>(vehicles,HttpStatus.FOUND);
+    }
+
+    @GetMapping("/list-by-id/{id}")
+    public ResponseEntity<?> listUserById(@PathVariable UUID id) {
+        Optional<User> user = Optional.ofNullable(userService.findById(id));
+        if(user.isPresent()){
+            return ResponseEntity.status(HttpStatus.OK).body(user.get());
+        }else{
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario não encontrado");
+        }
     }
 
 
