@@ -33,4 +33,6 @@ public class User {
     @JsonManagedReference
     private List<Vehicle> vehicles;
     private LocalDateTime createdAt;
+    @Lob
+    private byte[] image;
 }

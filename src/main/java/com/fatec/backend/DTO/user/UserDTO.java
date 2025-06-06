@@ -9,5 +9,6 @@ public record UserDTO(UUID id,
                       String email,
                       String username,
                       @JsonIgnore String password,
-                      LocalDate createdAt) {
+                      LocalDate createdAt,
+                      byte[] image) {
 }

@@ -24,7 +24,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -66,6 +68,7 @@ public class UserService {
                     .Phone(createUserDTO.phone())
                     .birthdate(createUserDTO.birthdate())
                     .createdAt(LocalDateTime.now())
+                    .image(null)
                     .build();
 
             return userRepository.save(user).getId();
@@ -128,11 +131,24 @@ public class UserService {
         if (userUpdateDTO.phone() != null && !userUpdateDTO.phone().isBlank()) {
             user.setPhone(userUpdateDTO.phone());
         }
-        if (userUpdateDTO.password() != null && !userUpdateDTO.password().isBlank()) {
-            // Ensure new password meets complexity requirements if any
-            user.setPassword(passwordEncoder.encode(userUpdateDTO.password()));
-        }
-
         return userRepository.save(user);
+    }
+
+    public User uploadImagem(UUID id, MultipartFile file) throws IOException {
+        User user =userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user == null) {
+            return null;
+        }
+        user.setImage(file.getBytes());
+        return userRepository.save(user);
+    }
+
+
+    public byte[] getImagem(UUID id) {
+        User user =userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        if (user == null || user.getImage() == null) {
+            return null;
+        }
+        return user.getImage();
     }
     }
