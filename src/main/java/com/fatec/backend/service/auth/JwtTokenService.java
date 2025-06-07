@@ -75,6 +75,22 @@ public class JwtTokenService {
             throw new JWTVerificationException("Token de recuperação inválido ou expirado.");
         }
     }
+
+    public boolean validateToken(String token) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(secretKey);
+            JWT.require(algorithm)
+                    .withIssuer(issuer)
+                    .build()
+                    .verify(token);
+            return true;
+        } catch (JWTVerificationException e) {
+            System.out.println("Token inválido ou expirado: " + e.getMessage());
+            return false;
+        }
+    }
+
+
     private Instant dataCriacao(){
         return ZonedDateTime
                 .now(ZoneId.of("America/Sao_Paulo"))
