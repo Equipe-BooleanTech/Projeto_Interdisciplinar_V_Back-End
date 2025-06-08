@@ -45,14 +45,14 @@ public class GasStationController {
     @GetMapping("/listall-gas-station")
     public ResponseEntity<Page<GasStationDTO>> listAllGasStation(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Page<GasStationDTO> gasStations = gasStationService.listGasStations(PageRequest.of(page, size));
-        return new ResponseEntity<>(gasStations, HttpStatus.FOUND);
+        return new ResponseEntity<>(gasStations, HttpStatus.OK);
     }
 
     @GetMapping("/findbyid-gas-station/{id}")
     public ResponseEntity<?> findGasStationById(@PathVariable UUID id) {
         Optional<GasStation> gasStation = Optional.ofNullable(gasStationService.findById(id));
         if (gasStation.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FOUND).body(gasStation);
+            return ResponseEntity.status(HttpStatus.OK).body(gasStation);
         }else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Posto não encontrado");
         }
