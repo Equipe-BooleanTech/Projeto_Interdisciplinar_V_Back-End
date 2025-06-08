@@ -121,8 +121,9 @@ public class UserController {
     }
 
     @GetMapping("/get-token/{id}")
-    public ResponseEntity<?> getToken(@PathVariable UUID id, @RequestBody LoginUserDTO loginUserDTO) {
+    public ResponseEntity<?> getToken(@PathVariable UUID id) {
         User user = userService.findById(id);
+        LoginUserDTO loginUserDTO = new LoginUserDTO(user.getEmail(), user.getPassword());
         JwtTokenDTO tokenDTO = userService.authenticarUsuario(loginUserDTO);
         String token = tokenDTO.token();
         return ResponseEntity.ok(token);
