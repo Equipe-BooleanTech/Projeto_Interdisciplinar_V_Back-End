@@ -102,7 +102,8 @@ public class UserController {
     }
 
     @PostMapping("/recuperar-senha")
-    public ResponseEntity<String> solicitarRecuperacaoSenha(@RequestBody String email) {
+    public ResponseEntity<String> solicitarRecuperacaoSenha(@PathVariable String email) {
+        System.out.println("Email" + email);
         try {
             userService.solicitarRecuperacaoSenha(email);
             return ResponseEntity.ok("Email de recuperação enviado com sucesso.");
