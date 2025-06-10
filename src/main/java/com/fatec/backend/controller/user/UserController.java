@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 @AllArgsConstructor
@@ -101,26 +102,6 @@ public class UserController {
         return ResponseEntity.ok("Imagem atualizada com sucesso!");
     }
 
-    @PostMapping("/recuperar-senha")
-    public ResponseEntity<String> solicitarRecuperacaoSenha(@PathVariable String email) {
-        System.out.println("Email" + email);
-        try {
-            userService.solicitarRecuperacaoSenha(email);
-            return ResponseEntity.ok("Email de recuperação enviado com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/resetar-senha")
-    public ResponseEntity<String> redefinirSenha(@RequestBody String token, @RequestBody String novaSenha) {
-        try {
-            userService.redefinirSenhaEsquecida(token, novaSenha);
-            return ResponseEntity.ok("Senha redefinida com sucesso.");
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
-        }
-    }
 
     @GetMapping("/get-token/{id}")
     public ResponseEntity<?> getToken(@PathVariable UUID id) {
@@ -147,5 +128,28 @@ public class UserController {
         User user = userService.findById(id);
         userService.redefinirSenha(id,dto);
         return ResponseEntity.ok("Senha alterada com sucesso.");
+    }
+
+    @PostMapping("/public/recuperar-senha")
+    public ResponseEntity<String> solicitarRecuperacaoSenha(@RequestBody Map<String, String> payload) {
+        String email = payload.get("email");
+        try {
+            userService.solicitarRecuperacaoSenha(email);
+            return ResponseEntity.ok("Se este email estiver cadastrado, você receberá um link de recuperação.");
+        } catch (Exception e) {
+            return ResponseEntity.ok("Se este email estiver cadastrado, você receberá um link de recuperação.");
+        }
+    }
+
+    @PostMapping("/public/resetar-senha")
+    public ResponseEntity<String> redefinirSenha(@RequestBody Map<String, String> payload) {
+        String token = payload.get("token");
+        String novaSenha = payload.get("novaSenha");
+        try {
+            userService.redefinirSenhaEsquecida(token, novaSenha);
+            return ResponseEntity.ok("Senha redefinida com sucesso.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Erro: " + e.getMessage());
+        }
     }
 }

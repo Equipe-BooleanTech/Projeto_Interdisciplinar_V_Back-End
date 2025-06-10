@@ -6,16 +6,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
-
+import java.util.UUID;
 
 public record UserDetailsImpl(User modelUser) implements UserDetails {
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Retorna uma única autoridade baseada no role do usuário
-        return List.of(new SimpleGrantedAuthority(modelUser.getName()));
+    public UUID getUserId() {
+        return modelUser.getId();
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(modelUser.getName()));
+    }
 
     @Override
     public String getPassword() {
