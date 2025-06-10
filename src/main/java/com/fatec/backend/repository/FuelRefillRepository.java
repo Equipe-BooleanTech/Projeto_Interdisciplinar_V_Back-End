@@ -17,5 +17,6 @@ public interface FuelRefillRepository extends JpaRepository<FuelRefill, UUID> {
     Optional<FuelRefill> findTopByVehicleOrderByRefillDateDesc(Vehicle vehicle);
     List<FuelRefill> findAllByVehicleIdAndRefillDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
     Page<FuelRefill> findAllByVehicleId(UUID vehicleId, Pageable pageable);
+    List<FuelRefill> findByVehicleIdAndRefillDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
 
 }
