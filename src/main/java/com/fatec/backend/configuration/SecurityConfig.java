@@ -47,6 +47,7 @@ public class SecurityConfig {
                                 "/api/users/resetar-senha",
                                 "/api/users/recuperar-senha",
                                 "/api/users/get-token/{id}",
+                                "/api/users/validate-token",
                                 "/api/users/redefinir-senha/",
                                 "/api/fipe/marcas",
                                 "/api/fipe/marcas/{marcaId}/modelos",

@@ -138,6 +138,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+
     public User uploadImagem(UUID id, MultipartFile file) throws IOException {
         User user =userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found"));
         if (user == null) {

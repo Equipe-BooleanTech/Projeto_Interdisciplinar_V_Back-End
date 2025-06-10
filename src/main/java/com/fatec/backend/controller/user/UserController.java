@@ -11,6 +11,7 @@ import com.fatec.backend.exception.UserNotFoundException;
 import com.fatec.backend.model.User;
 import com.fatec.backend.response.SuccessResponse;
 import com.fatec.backend.response.UpdateResponse;
+import com.fatec.backend.service.auth.JwtTokenService;
 import com.fatec.backend.service.user.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,7 +31,7 @@ import java.util.UUID;
 public class UserController {
 
     private final UserService userService;
-
+    private final JwtTokenService jwtTokenService;
 
 
     @PostMapping("/login")
@@ -101,7 +102,8 @@ public class UserController {
     }
 
     @PostMapping("/recuperar-senha")
-    public ResponseEntity<String> solicitarRecuperacaoSenha(@RequestBody String email) {
+    public ResponseEntity<String> solicitarRecuperacaoSenha(@PathVariable String email) {
+        System.out.println("Email" + email);
         try {
             userService.solicitarRecuperacaoSenha(email);
             return ResponseEntity.ok("Email de recuperação enviado com sucesso.");
@@ -128,6 +130,17 @@ public class UserController {
         String token = tokenDTO.token();
         return ResponseEntity.ok(token);
     }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<String> validateToken(@RequestParam("token") String token) {
+        boolean isValid = jwtTokenService.validateToken(token);
+        if (isValid) {
+            return ResponseEntity.ok("Token válido.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido ou expirado.");
+        }
+    }
+
 
     @PutMapping("/redefinir-senha/{id}")
     public ResponseEntity<?> setPassword(@PathVariable UUID id, @RequestBody PasswordDTO dto) {

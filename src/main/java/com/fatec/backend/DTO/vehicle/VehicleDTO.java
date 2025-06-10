@@ -13,7 +13,7 @@ public record VehicleDTO(
         String type,
         String description,
         String year,
-        String odometer,
+        Double odometer,
         FuelType fuelType,
         Double fuelCapacity,
         Double fuelConsumption,
