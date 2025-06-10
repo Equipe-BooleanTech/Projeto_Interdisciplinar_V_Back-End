@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 "/api/vehicle/listall-vehicle/{userId}",
                                 "/api/vehicle/findbyid-vehicle/{id}",
                                 "/api/vehicle/findbyplate/{plate}",
+                                "/api/vehicle/expenses/{vehicleId}",
                                 "/api/users/create-user",
                                 "/api/users/delete/{id}",
                                 "/api/users/update/{id}",
