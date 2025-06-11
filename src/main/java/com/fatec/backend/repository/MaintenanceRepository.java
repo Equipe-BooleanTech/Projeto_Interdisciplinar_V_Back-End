@@ -18,5 +18,6 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, UUID> 
     List<Maintenance> findAllByVehicleIdAndDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
     Page<Maintenance> findAllByVehicleId(UUID vehicleId, Pageable pageable);
     List<Maintenance> findByVehicleIdAndDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
+    List<Maintenance> findByVehicleIdAndTypeAndDateBetween(UUID vehicleId, Maintenance type, LocalDateTime start, LocalDateTime end);
     }
 

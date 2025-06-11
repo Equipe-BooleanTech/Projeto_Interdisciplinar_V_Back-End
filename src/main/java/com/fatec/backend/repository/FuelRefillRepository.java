@@ -1,5 +1,6 @@
 package com.fatec.backend.repository;
 
+import com.fatec.backend.enums.FuelType;
 import com.fatec.backend.model.vehicle.FuelRefill;
 import com.fatec.backend.model.vehicle.Maintenance;
 import com.fatec.backend.model.vehicle.Vehicle;
@@ -18,5 +19,5 @@ public interface FuelRefillRepository extends JpaRepository<FuelRefill, UUID> {
     List<FuelRefill> findAllByVehicleIdAndRefillDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
     Page<FuelRefill> findAllByVehicleId(UUID vehicleId, Pageable pageable);
     List<FuelRefill> findByVehicleIdAndRefillDateBetween(UUID vehicleId, LocalDateTime start, LocalDateTime end);
-
+    List<FuelRefill> findByVehicleIdAndFuelTypeAndRefillDateBetween(UUID vehicleId, FuelType fuelType, LocalDateTime start, LocalDateTime end);
 }
