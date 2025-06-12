@@ -189,11 +189,14 @@ public class UserService {
 
     public void redefinirSenha(UUID id, PasswordDTO passwordDTO) {
         Optional<User> usuario = userRepository.findById(id);
-        if (usuario.isEmpty()) throw new IllegalArgumentException("User not found");
-        if(usuario.get().getPassword().equals(passwordEncoder.encode(passwordDTO.oldPassword()))){
-            usuario.get().setPassword(passwordEncoder.encode(passwordDTO.newPassword()));
-        }else {
-            throw new RuntimeException("Senha incorreta");
+        if (usuario.isEmpty()) throw new IllegalArgumentException("Usuário não encontrado com este token.");
+
+        User user = usuario.get();
+
+        if (!passwordEncoder.matches(passwordDTO.oldPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Senha antiga incorreta.");
         }
-    }
-    }
+
+        user.setPassword(passwordEncoder.encode(passwordDTO.newPassword()));
+        userRepository.save(user);
+    }}
